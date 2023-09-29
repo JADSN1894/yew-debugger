@@ -1,11 +1,11 @@
 [package]
-name = "helloworld-demo"
-version = "0.1.0"
+name = "background"
+version = "0.0.2"
 edition = "2021"
 
 [lib]
 crate-type = ["cdylib"]
 
 [dependencies]
-wasm-bindgen = "0.2.84"
-web-sys = { version = "0.3.61", features = ['console'] }
+wasm-bindgen = "0.2.87"
+web-sys = { version = "0.3.64", features = ['console'] }

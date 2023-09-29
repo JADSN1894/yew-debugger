@@ -1,4 +1,4 @@
-import init, { print, print_with_value } from './background/helloworld_demo.js';
+import init, { print, print_with_value } from './background/background.js';
 
 chrome.runtime.onInstalled.addListener(() => {
   runDemo();

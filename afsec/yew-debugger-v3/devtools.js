@@ -12,6 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-chrome.devtools.panels.create('Yew Debugger', 'icon.png', 'panel/index.html', () => {
+chrome.devtools.panels.create('Yew Debugger', 'icon.png', 'panel/dist/index.html', () => {
   console.log('user switched to this panel');
 });

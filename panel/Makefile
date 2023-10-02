@@ -20,15 +20,17 @@ help:
 	@printf "\t$(MAKE) release\n"
 	@printf "\n"
 
+pre_build:
+	@npm install
 
-dev: clean
+dev: clean pre_build
 	$(MAKE) -C wasm dev
-	npm run dev
+	@npm run dev
 
-release: clean
+release: clean pre_build
 	$(MAKE) -C wasm release
-	npm run build
+	@npm run build
 
 clean:
 	$(MAKE) -C wasm clean
-	rm -rfv $(DIST_DIR)
+	@rm -rfv $(DIST_DIR)

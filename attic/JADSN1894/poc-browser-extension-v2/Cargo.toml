@@ -1,0 +1,20 @@
+[workspace]
+members = ['src/*']
+default-members = ["src/extension"]
+resolver = "2"
+# build = "build.rs"
+
+[workspace.package]
+publish = false
+edition = "2021"
+rust-version = "1.72.1"
+version = "0.0.1"
+description = "DevTools extension for Yew"
+authors = ["https://github.com/JADSN1894"]
+license = "MIT"
+
+[workspace.dependencies]
+gloo = { version = "=0.10.0" }
+js-sys = { version = "0.3.64" }
+wasm-bindgen = { version = "=0.2.87" }
+yew = { version = "0.21.0", features = ["csr"] }

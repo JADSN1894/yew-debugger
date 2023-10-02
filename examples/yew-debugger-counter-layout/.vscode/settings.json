@@ -1,0 +1,8 @@
+{
+    "editor.formatOnSave": false,
+    "explorer.compactFolders": false,
+    "editor.fontWeight": "bold",
+    "tailwindCSS.includeLanguages": {
+        "rust": "html"
+    },
+}

@@ -1,0 +1,12 @@
+{
+	"recommendations": [
+		"vivaxy.vscode-conventional-commits",
+		"usernamehw.errorlens",
+		"aaron-bond.better-comments",
+		"rust-lang.rust-analyzer",
+		"serayuzgur.crates",
+		"tamasfe.even-better-toml",
+		"jnoortheen.nix-ide",
+		"yzhang.markdown-all-in-one"
+	]
+}

@@ -1,0 +1,28 @@
+{
+  "name": "Yew Debugger",
+  "version": "0.3",
+  "manifest_version": 3,
+  "description": "Just a Elm-like debugger for Yew",
+  "background": {
+    "service_worker": "background.js",
+    "type": "module"
+  },
+  "content_security_policy": {
+    "extension_pages": "script-src 'self' 'wasm-unsafe-eval'; object-src 'self';"
+  },
+  "devtools_page": "devtools.html",
+  "content_scripts": [
+    {
+      "matches": [
+        "http://*/*",
+        "https://*/*"
+      ],
+      "js": [
+        "content-script.js"
+      ]
+    }
+  ],
+  "permissions": [
+    "nativeMessaging"
+  ]
+}

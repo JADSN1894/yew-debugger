@@ -2,8 +2,8 @@
 export default {
   // content: ["./app/**/*.{html,js,css,rs}"],
   content: [
-    "index.html",
-    "./app/**/*.rs"
+    "./index.html",
+    "./yew-app/**/*.rs"
   ],
   daisyui: {
     themes: ["light", "dark"],

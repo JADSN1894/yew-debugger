@@ -4,7 +4,7 @@ terminal-1:
 
 # Watch app Frontend
 terminal-2:
-    @watchexec --watch ./app  --no-vcs-ignore --restart --clear --exts rs wasm-pack build --target web --no-typescript --mode force --dev --out-name index --out-dir ../wasm ./app
+    @watchexec --watch ./yew-app  --no-vcs-ignore --restart --clear --exts rs wasm-pack build --target web --no-typescript --mode force --dev --out-name index --out-dir ../wasm ./yew-app
 
 # Vite bundler in dev
 terminal-3:

@@ -1,8 +1,8 @@
 {
-  "name": "WASM Load Example - Helloworld",
-  "version": "1.0",
+  "name": "Yew Debugger",
+  "version": "0.3",
   "manifest_version": 3,
-  "description": "Shows how to use WebAssembly (WASM) as a module in Manifest V3.",
+  "description": "Just a Elm-like debugger for Yew",
   "background": {
     "service_worker": "background.js",
     "type": "module"

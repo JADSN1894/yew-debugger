@@ -1,0 +1,10 @@
+[build]
+# Entry point for your JavaScript application
+entry = "main.js"
+
+[static]
+# Any static assets you want to include (e.g., HTML, CSS)
+files = ["index.html"]
+
+[dependencies]
+# Add any JavaScript dependencies you need here

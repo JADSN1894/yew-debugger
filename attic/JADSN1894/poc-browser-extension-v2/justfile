@@ -1,0 +1,2 @@
+run:
+    @watchexec -rc -e rs -- wasm-pack build  --target web --mode force --debug  --out-dir ../../pkg/extension ./src/extension

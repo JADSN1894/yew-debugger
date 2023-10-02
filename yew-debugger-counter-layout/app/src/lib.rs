@@ -1,3 +1,6 @@
+mod components;
+mod models;
+
 use std::ops::{AddAssign, SubAssign};
 
 use gloo::{
@@ -5,9 +8,12 @@ use gloo::{
     utils::document,
 };
 use js_sys::Date;
+use models::{CounterModel, ThemeMode};
 use wasm_bindgen::{prelude::wasm_bindgen, JsCast, JsValue, UnwrapThrowExt};
 use web_sys::HtmlElement;
 use yew::{html, Component, Context, Html};
+
+use crate::components::CounterComponent;
 
 pub enum Msg {
     Increment,
@@ -15,75 +21,19 @@ pub enum Msg {
     ToggleThemeMode,
 }
 
-#[derive(Clone, Debug, Default)]
-pub enum ThemeMode {
-    #[default]
-    Dark,
-    Light,
-}
-
-impl From<ThemeMode> for bool {
-    fn from(value: ThemeMode) -> Self {
-        match value {
-            ThemeMode::Dark => true,
-            ThemeMode::Light => false,
-        }
-    }
-}
-
-impl From<ThemeMode> for &str {
-    fn from(value: ThemeMode) -> Self {
-        match value {
-            ThemeMode::Dark => "dark",
-            ThemeMode::Light => "light",
-        }
-    }
-}
-
-#[derive(Clone, Debug, Default)]
-pub struct Counter(i64);
-
-impl Counter {
-    pub fn take(self) -> i64 {
-        self.0
-    }
-
-    pub fn set_counter(mut self, new_value: i64) {
-        self.0 = new_value
-    }
-}
-
-impl From<i64> for Counter {
-    fn from(value: i64) -> Self {
-        Self(value)
-    }
-}
-
-impl AddAssign for Counter {
-    fn add_assign(&mut self, rhs: Self) {
-        self.0 += rhs.0;
-    }
-}
-
-impl SubAssign for Counter {
-    fn sub_assign(&mut self, rhs: Self) {
-        self.0 -= rhs.0;
-    }
-}
-
 #[derive(Debug)]
 pub struct App {
-    value: Counter,
+    counter: CounterModel,
     current_theme_mode: ThemeMode,
 }
 
 impl App {
-    pub fn value(&self) -> &Counter {
-        &self.value
+    pub fn counter(&self) -> &CounterModel {
+        &self.counter
     }
 
-    pub fn set_value(&mut self, value: Counter) {
-        self.value = value;
+    pub fn set_counter(&mut self, value: CounterModel) {
+        self.counter = value;
     }
 
     pub fn current_theme_mode(&self) -> &ThemeMode {
@@ -111,7 +61,7 @@ impl Default for App {
             .unwrap_throw();
 
         Self {
-            value: Default::default(),
+            counter: Default::default(),
             current_theme_mode: Default::default(),
         }
     }
@@ -128,13 +78,13 @@ impl Component for App {
     fn update(&mut self, _ctx: &Context<Self>, msg: Self::Message) -> bool {
         match msg {
             Msg::Increment => {
-                self.value.add_assign(1.into());
+                self.counter.add_assign(1.into());
                 console::log!("plus one");
                 true
             }
 
             Msg::Decrement => {
-                self.value.sub_assign(1.into());
+                self.counter.sub_assign(1.into());
                 console::log!("minus one");
                 true
             }
@@ -167,41 +117,53 @@ impl Component for App {
 
     fn view(&self, ctx: &Context<Self>) -> Html {
         html! {
-            <div class="flex justify-center items-center h-screen w-screen font-mono border-success border-dashed border-2">
-                <div class="flex flex-col gap-y-4 border-info border-dashed border-2 p-2">
-                // Display the current value of the counter
-                    <div class="flex items-center justify-between border-warning border-dashed border-2 w-full p-2">
-                        <p class="text-3xl font-bold">
-                            { self.value().clone().take() }
-                        </p>
-                        <input type="checkbox" class="toggle toggle-primary" onchange={ctx.link().callback(|_| Msg::ToggleThemeMode)} checked={self.current_theme_mode.clone().into()} />
-                    </div>
+            <div class="h-screen w-screen flex items-center justify-center border-info border-dashed border-2">
+                <div class="w-[400px] h-[750px] flex flex-col items-center justify-center border-success border-dashed border-2">
 
-                    <div class="flex items-center justify-center gap-x-2 border-warning border-dashed border-2 w-full p-2">
-                        // A button to send the Increment message
-                        <button class="btn btn-primary" onclick={ctx.link().callback(|_| Msg::Increment)}>
-                            { "+1" }
-                        </button>
+                        // Header
+                        <div class="flex items-center justify-end mr-2 border-success border-dashed border-2">
+                            <input type="checkbox" class="toggle toggle-primary" onchange={ctx.link().callback(|_| Msg::ToggleThemeMode)} checked={self.current_theme_mode.clone().into()} />
+                        </div>
 
-                        // A button to send the Decrement message
-                        <button class="btn btn-primary" onclick={ctx.link().callback(|_| Msg::Decrement)}>
-                            { "-1" }
-                        </button>
+                        // Content
+                        <div class="flex flex-col flex-grow items-center justify-center gap-y-2 border-warning border-dashed border-2 w-full p-2">
 
-                        // A button to send two Increment messages
-                        <button class="btn btn-primary" onclick={ctx.link().batch_callback(|_| vec![Msg::Increment, Msg::Increment])}>
-                            { "+1, +1" }
-                        </button>
-                    </div>
-                    <div class="border-warning border-dashed border-2 w-full p-2">
-                        // Display the current date and time the page was rendered
-                        <p class="text-xl">
-                            { "Rendered: " }
-                            { String::from(Date::new_0().to_string()) }
-                        </p>
-                    </div>
+                            // Display the current value of the counter
+                            <div>
+                                <p class="text-3xl font-bold border-warning border-dashed border-2 w-full p-2">
+                                    { self.counter().clone().take() }
+                                </p>
+                            </div>
+
+                            <div class="flex items-center justify-center gap-x-2 border-warning border-dashed border-2 w-full p-2">
+                                // A button to send the Increment message
+                                <button class="btn btn-primary" onclick={ctx.link().callback(|_| Msg::Increment)}>
+                                    { "+1" }
+                                </button>
+
+                                // A button to send the Decrement message
+                                <button class="btn btn-primary" onclick={ctx.link().callback(|_| Msg::Decrement)}>
+                                    { "-1" }
+                                </button>
+
+                                // A button to send two Increment messages
+                                <button class="btn btn-primary" onclick={ctx.link().batch_callback(|_| vec![Msg::Increment, Msg::Increment])}>
+                                    { "*2" }
+                                </button>
+                            </div>
+                        </div>
+
+                        // <CounterComponent counter={self.counter().clone()} />
+
+                        // Footer
+                        <div class="flex items-center justify-center border-success border-dashed border-2">
+                            <p class="text-xs">
+                                    { "Rendered: " }
+                                    { String::from(Date::new_0().to_string()) }
+                                </p>
+                        </div>
                 </div>
-            </div>
+        </div>
         }
     }
 }

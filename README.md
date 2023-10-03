@@ -26,7 +26,7 @@ Huge thanks to [afsec](https://github.com/afsec#afsec) for giving me the idea fo
 Feel free to reach out to me at [E-mail](9gdcij581@mozmail.com) to discuss how `yew-debugger` can elevate the quality of your Yew development and improve the end-user experience!
 
 ## 📢 Feedback and Issue Reporting:
-If you have any feedback, suggestions, or encounter issues while using YewDebug, please let us know! You can report issues or provide feedback on our (GitHub repository)[https://github.com/JADSN1894/yew-debugger/issues].
+If you have any feedback, suggestions, or encounter issues while using YewDebug, please let us know! You can report issues or provide feedback on our [GitHub repository](https://github.com/JADSN1894/yew-debugger/issues).
 
 Appreciate your feedback, and it helps us continually improve the extension for the Yew community.
 

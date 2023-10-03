@@ -1,18 +1,19 @@
-// setTimeout(async () => {
-//     const msg = { recipient: "YewDebugger", message: "PING?" };
-//     const response = await chrome.runtime.sendMessage(msg);
-//     // do something with response here, not outside the function
-//     console.warn(response);
-// }, 1000)
 
 window.addEventListener(
     "message",
     async (event) => {
-        console.warn(event);
-        // const msg = { recipient: "YewDebugger", message: "PING?" };
+        console.log(event);
         const msg = event["data"] || null;
+
+        console.log("content-script");
+        console.log("msg");
+        console.log(msg);
+
         const response = await chrome.runtime.sendMessage(msg);
-        console.log(response);
+
+        const from_background_wasm = JSON.parse(response["message"])
+        console.log(from_background_wasm);
+
     },
     false,
 );

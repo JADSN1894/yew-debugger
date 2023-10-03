@@ -1,12 +1,6 @@
-use wasm_bindgen::prelude::*;
+use serde::{Deserialize, Serialize};
+use wasm_bindgen::{prelude::wasm_bindgen, JsValue};
 use web_sys::console;
-
-// will be called when the wasm module is loaded
-// https://rustwasm.github.io/docs/wasm-bindgen/reference/attributes/on-rust-exports/start.html
-#[wasm_bindgen(start)]
-pub fn main() {
-    console::log_1(&"[from wasm] Inited.".into());
-}
 
 #[wasm_bindgen]
 pub fn print() {
@@ -17,4 +11,23 @@ pub fn print() {
 pub fn print_with_value(value: &str) {
     // with 2-args log function
     console::log_2(&"[from wasm] Hello".into(), &value.into());
+}
+
+#[wasm_bindgen]
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct Envelope {
+    message: String,
+}
+
+#[wasm_bindgen]
+pub fn receive_evelope(input: JsValue) -> Result<JsValue, JsValue> {
+    match serde_wasm_bindgen::from_value::<Envelope>(input) {
+        Ok(evelope) => Ok(serde_wasm_bindgen::to_value(&evelope)?),
+        Err(error) => {
+            let mut envelope = Envelope { message: "".into() };
+            envelope.message = error.to_string();
+
+            Ok(serde_wasm_bindgen::to_value(&envelope)?)
+        }
+    }
 }

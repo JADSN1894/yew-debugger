@@ -2,7 +2,7 @@
 	"name": "yew_debugger",
 	"runArgs": [
 		"--name",
-        	"yew_debbuger",
+		"yew_debbuger",
 		"-e",
 		"TERM=xterm-256color",
 		"-e",
@@ -42,7 +42,9 @@
 				"aaron-bond.better-comments",
 				"rust-lang.rust-analyzer",
 				"serayuzgur.crates",
-				"tamasfe.even-better-toml"
+				"tamasfe.even-better-toml",
+				"TechTheAwesome.rust-yew",
+				"tkcandrade.code-annotation"
 			],
 			"settings": {
 				"editor.formatOnSave": true,

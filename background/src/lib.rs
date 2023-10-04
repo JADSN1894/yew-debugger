@@ -24,7 +24,9 @@ pub fn receive_evelope(input: JsValue) -> Result<JsValue, JsValue> {
     match serde_wasm_bindgen::from_value::<Envelope>(input) {
         Ok(evelope) => Ok(serde_wasm_bindgen::to_value(&evelope)?),
         Err(error) => {
-            let mut envelope = Envelope { message: "".into() };
+            let mut envelope = Envelope {
+                message: error.to_string(),
+            };
             envelope.message = error.to_string();
 
             Ok(serde_wasm_bindgen::to_value(&envelope)?)

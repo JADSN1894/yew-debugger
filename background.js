@@ -48,8 +48,10 @@ function handleMessageFromContentScript(sender, message, sendResponse) {
   };
 
   //* Call the exported functions from the background WASM module
-  const response_from_background_wasm = receive_envelope(message_to_send);
-  sendResponse(response_from_background_wasm);
+  const response_from_background_wasm = receive_envelope(JSON.stringify(message_to_send));
+  const outcome = JSON.parse(response_from_background_wasm)
+  console.log(outcome)
+  sendResponse(outcome);
 }
 
 function handleMessageFromPanel(sender, message, sendResponse) {

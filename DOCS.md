@@ -13,6 +13,7 @@ Some links
 1. [**Cargo bool `build.rs`**](https://doc.rust-lang.org/cargo/reference/build-script-examples.html)
 1. [**Chrome Devpanel Extension Communicating with Background Page**](https://stackoverflow.com/questions/11661613/chrome-devpanel-extension-communicating-with-background-page)
 1. [**Extension-with-WASM**](https://github.com/inflatablegrade/Extension-with-WASM/tree/manifest-v3)
+1. [**Create an extension that customizes the DevTools UI**](https://learn.microsoft.com/en-us/microsoft-edge/extensions-chromium/developer-guide/devtools-extension)
 
 ## Layouts
 1. [**Vue.js devtools**](https://chrome.google.com/webstore/detail/vuejs-devtools/nhdogjmejiglipccpnnnanhbledajbpd)

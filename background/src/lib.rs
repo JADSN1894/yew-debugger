@@ -1,6 +1,6 @@
 use serde::{Deserialize, Serialize};
 use wasm_bindgen::{prelude::wasm_bindgen, JsValue};
-use web_sys::console;
+use web_sys::console::{self};
 
 #[wasm_bindgen]
 pub fn print() {
@@ -9,12 +9,11 @@ pub fn print() {
 
 #[wasm_bindgen]
 pub fn print_with_value(value: &str) {
-    // with 2-args log function
     console::log_2(&"[from wasm] Hello".into(), &value.into());
 }
 
 #[wasm_bindgen]
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct Envelope {
     message: String,
 }

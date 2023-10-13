@@ -1,3 +1,5 @@
+console.log("content-script.js loaded!");
+
 window.addEventListener(
     "message",
     async (event) => {

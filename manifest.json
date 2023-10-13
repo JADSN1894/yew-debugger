@@ -9,20 +9,15 @@
     "service_worker": "background.js",
     "type": "module"
   },
-  "minimum_chrome_version": "116",
   "content_security_policy": {
     "extension_pages": "script-src 'self' 'wasm-unsafe-eval'; object-src 'self';"
   },
   "devtools_page": "devtools.html",
-  "host_permissions": [
-    "http://127.0.0.1/*",
-    "https://127.0.0.1/*"
-  ],
   "content_scripts": [
     {
       "matches": [
-        "http://127.0.0.1/*",
-        "https://127.0.0.1/*"
+        "http://*/*",
+        "https://*/*"
       ],
       "js": [
         "content-script.js"
@@ -30,17 +25,6 @@
     }
   ],
   "permissions": [
-    "nativeMessaging",
-    "tabs",
-    "activeTab",
-    "scripting",
-    "storage",
-    "unlimitedStorage"
-  ],
-  "externally_connectable": {
-    "matches": [
-      "http://127.0.0.1/*",
-      "https://127.0.0.1/*"
-    ]
-  }
+    "nativeMessaging"
+  ]
 }

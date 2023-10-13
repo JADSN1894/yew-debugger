@@ -7,6 +7,8 @@
 		"serayuzgur.crates",
 		"tamasfe.even-better-toml",
 		"jnoortheen.nix-ide",
-		"yzhang.markdown-all-in-one"
+		"yzhang.markdown-all-in-one",
+		"techtheawesome.rust-yew",
+		"tkcandrade.code-annotation"
 	]
 }

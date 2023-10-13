@@ -12,9 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-function initPanel() {  
+function initPanel() {
   const types = {};
   chrome.devtools.inspectedWindow.getResources((resources) => {
+
+    console.log("resources");
+    console.log(resources);
     // resources.forEach((resource) => {
     //   if (!(resource.type in types)) {
     //     types[resource.type] = 0;

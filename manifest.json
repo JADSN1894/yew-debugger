@@ -1,16 +1,23 @@
 {
   "name": "Yew Debugger",
+  "author": "JADSN1894",
   "version": "0.3",
   "manifest_version": 3,
   "description": "Just a Elm-like debugger for Yew",
+  "homepage_url": "https://github.com/JADSN1894/yew-debugger",
   "background": {
     "service_worker": "background.js",
     "type": "module"
   },
+  "minimum_chrome_version": "116",
   "content_security_policy": {
     "extension_pages": "script-src 'self' 'wasm-unsafe-eval'; object-src 'self';"
   },
   "devtools_page": "devtools.html",
+  "host_permissions": [
+    "http://127.0.0.1/*",
+    "https://127.0.0.1/*"
+  ],
   "content_scripts": [
     {
       "matches": [
@@ -23,6 +30,17 @@
     }
   ],
   "permissions": [
-    "nativeMessaging"
-  ]
+    "nativeMessaging",
+    "tabs",
+    "activeTab",
+    "scripting",
+    "storage",
+    "unlimitedStorage"
+  ],
+  "externally_connectable": {
+    "matches": [
+      "http://127.0.0.1/*",
+      "https://127.0.0.1/*"
+    ]
+  }
 }

@@ -11,8 +11,7 @@ crate-type = ["cdylib", "rlib"]
 
 [dependencies]
 gloo = { workspace = true }
-# yew = { workspace = true, features = ["csr"] }
-yew = { workspace = true }
+yew = { workspace = true, features = ["csr"] }
 js-sys = { workspace = true }
 serde = { workspace = true }
 serde_json = { workspace = true }

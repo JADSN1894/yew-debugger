@@ -1,6 +1,29 @@
+// use gloo::console::log;
+use js_sys::Function;
 use serde::{Deserialize, Serialize};
-use wasm_bindgen::{prelude::wasm_bindgen, JsValue};
+// use serde_json::{json, Value};
+use wasm_bindgen::{
+    prelude::wasm_bindgen,
+    // JsCast,
+    JsValue,
+};
 use web_sys::console::{self};
+
+// TODO:
+#[wasm_bindgen]
+extern "C" {
+    #[wasm_bindgen(js_namespace = ["chrome.runtime"])]
+    fn sendMessage(message: JsValue);
+
+    #[wasm_bindgen(js_namespace = ["chrome.runtime.onMessage"])]
+    fn addListener(callback: &Function);
+
+    #[wasm_bindgen(js_namespace = ["chrome.storage.local.get"])]
+    fn get(keys: JsValue);
+
+    #[wasm_bindgen(js_namespace = ["chrome.storage.local.set"])]
+    fn set(items: JsValue, func: &Function);
+}
 
 #[wasm_bindgen]
 pub fn print() {

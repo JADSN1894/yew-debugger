@@ -18,20 +18,20 @@ use wasm_bindgen::{
 };
 use yew::{html, Component, Context, Html, ToHtml};
 
-#[wasm_bindgen]
-extern "C" {
-    #[wasm_bindgen(js_namespace = ["chrome.runtime"])]
-    fn sendMessage(message: JsValue);
+// #[wasm_bindgen]
+// extern "C" {
+//     #[wasm_bindgen(js_namespace = ["chrome.runtime"])]
+//     fn sendMessage(message: JsValue);
 
-    #[wasm_bindgen(js_namespace = ["chrome.runtime.onMessage"])]
-    fn addListener(callback: &Function);
+//     #[wasm_bindgen(js_namespace = ["chrome.runtime.onMessage"])]
+//     fn addListener(callback: &Function);
 
-    #[wasm_bindgen(js_namespace = ["chrome.storage.local.get"])]
-    fn get(keys: JsValue);
+//     #[wasm_bindgen(js_namespace = ["chrome.storage.local.get"])]
+//     fn get(keys: JsValue);
 
-    #[wasm_bindgen(js_namespace = ["chrome.storage.local.set"])]
-    fn set(items: JsValue, func: &Function);
-}
+//     #[wasm_bindgen(js_namespace = ["chrome.storage.local.set"])]
+//     fn set(items: JsValue, func: &Function);
+// }
 
 const MODEL_INIT: Model = Model { data: None };
 

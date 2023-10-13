@@ -21,7 +21,7 @@ pub struct Envelope {
 #[wasm_bindgen]
 pub fn receive_evelope(input: JsValue) -> Result<JsValue, JsValue> {
     match serde_wasm_bindgen::from_value::<Envelope>(input) {
-        Ok(evelope) => Ok(serde_wasm_bindgen::to_value(&evelope)?),
+        Ok(inner_envelope) => Ok(serde_wasm_bindgen::to_value(&inner_envelope)?),
         Err(error) => {
             let mut envelope = Envelope {
                 message: error.to_string(),

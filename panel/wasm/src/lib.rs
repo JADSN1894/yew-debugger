@@ -3,7 +3,7 @@ mod macros;
 mod traits;
 
 use crate::traits::Name;
-use gloo::{console::log, utils::format::JsValueSerdeExt};
+use gloo::console::log;
 use js_sys::Function;
 use serde::{Deserialize, Serialize};
 use serde_json::{json, Value};
@@ -16,7 +16,6 @@ use wasm_bindgen::{
     prelude::{wasm_bindgen, Closure},
     JsCast, JsValue,
 };
-use web_sys::DedicatedWorkerGlobalScope;
 use yew::{html, Component, Context, Html, ToHtml};
 
 #[wasm_bindgen]
@@ -25,7 +24,13 @@ extern "C" {
     fn sendMessage(message: JsValue);
 
     #[wasm_bindgen(js_namespace = ["chrome.runtime.onMessage"])]
-    fn addListener(args: &Function);
+    fn addListener(callback: &Function);
+
+    #[wasm_bindgen(js_namespace = ["chrome.storage.local.get"])]
+    fn get(keys: JsValue);
+
+    #[wasm_bindgen(js_namespace = ["chrome.storage.local.set"])]
+    fn set(items: JsValue, func: &Function);
 }
 
 const MODEL_INIT: Model = Model { data: None };
@@ -162,18 +167,18 @@ impl ToHtml for EnvelopeWrapper {
     }
 }
 
-// impl App {
-//     fn send_to_debugger(envelope: Value) {
-//         log!("send_to_debugger(_)");
-//         let recipient = "yew-debugger";
-//         let dbg_msg = json! {
-//             {
-//                 "recipient": recipient,
-//                 "envelope": envelope
-//             }
-//         };
-//     }
-// }
+impl App {
+    fn send_to_debugger(envelope: Value) {
+        log!("send_to_debugger(_)");
+        let recipient = "yew-debugger";
+        let dbg_msg = json! {
+            {
+                "recipient": recipient,
+                "envelope": envelope
+            }
+        };
+    }
+}
 
 impl Component for App {
     type Message = Msg;

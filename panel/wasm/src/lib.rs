@@ -3,19 +3,20 @@ mod macros;
 mod traits;
 
 use crate::traits::Name;
-use gloo::console::log;
+use gloo::console;
+use gloo::utils::format::JsValueSerdeExt;
+use js_sys::Date;
+use serde::Serialize;
+use serde_json::json;
+use serde_json::Value;
+use std::fmt::{Debug, Display};
+use std::{cell::RefCell, marker::PhantomData};
+use wasm_bindgen::prelude::*;
+use wasm_bindgen::{JsCast, JsValue};
+use web_sys::{DedicatedWorkerGlobalScope, MessageEvent};
+use yew::{html, Component, Context, Html};
 
-use serde::{Deserialize, Serialize};
-use serde_json::{json, Value};
-use std::{
-    cell::RefCell,
-    fmt::{Debug, Display},
-    marker::PhantomData,
-};
-use wasm_bindgen::prelude::wasm_bindgen;
-use yew::{html, Component, Context, Html, ToHtml};
-
-const MODEL_INIT: Model = Model { data: None };
+const MODEL_INIT: Model = Model { counter: 0 };
 
 thread_local! {
     static DEBBUGER_APP: RefCell<MVUDebbuger<App>> = const {
@@ -25,6 +26,12 @@ thread_local! {
             cur_msg: Msg::Nil,
             cur_model: MODEL_INIT })};
 
+}
+
+#[wasm_bindgen]
+extern "C" {
+    #[wasm_bindgen(js_namespace = ["chrome.runtime"])]
+    fn sendMessage(message: JsValue);
 }
 
 impl_name! {App}
@@ -100,65 +107,35 @@ impl<C: Component + Name> MVUDebbuger<C> {
 #[derive(Debug, Clone, Serialize)]
 pub enum Msg {
     Nil,
-    UpdateData(EnvelopeWrapper),
+    GetEvents,
 }
 
-#[derive(Debug, Clone, Serialize)]
+#[derive(Debug, Clone)]
 pub struct App {
-    model: Model,
+    model: Model, // This will store the counter value
 }
-
-#[derive(Debug, Clone, Serialize, Default)]
+#[derive(Debug, Clone, Serialize)]
 pub struct Model {
-    data: Option<EnvelopeWrapper>,
-}
-
-#[wasm_bindgen]
-#[derive(Debug, Serialize, Deserialize, Clone)]
-struct EnvelopeMetada {
-    msg: String,
-    msg_id: usize,
-}
-
-#[wasm_bindgen]
-#[derive(Debug, Serialize, Deserialize, Clone)]
-struct Envelope {
-    metadata: EnvelopeMetada,
-    model: Value,
-}
-
-#[wasm_bindgen]
-#[derive(Debug, Serialize, Deserialize, Clone)]
-pub struct EnvelopeWrapper {
-    envelope: Envelope,
-    recipient: String,
-}
-
-impl ToHtml for EnvelopeWrapper {
-    fn to_html(&self) -> Html {
-        log!(format!("View"));
-        log!(format!("{:?}", &self));
-        let html = serde_json::to_string_pretty(self)
-            .map_or("See the logs".into(), |error| error.to_string());
-
-        html!(
-            <div>
-                {html}
-            </div>
-        )
-    }
+    counter: i32,
 }
 
 impl App {
     fn send_to_debugger(envelope: Value) {
-        log!("send_to_debugger(_)");
         let recipient = "yew-debugger";
         let dbg_msg = json! {
-            {
-                "recipient": recipient,
-                "envelope": envelope
-            }
+        {
+            "recipient": recipient,
+            "envelope": envelope
+        }
+
         };
+        // let global_scope: DedicatedWorkerGlobalScope = js_sys::global().unchecked_into();
+        // let
+        // Send the first message from Rust to the main thread
+        // let _ = global_scope.post_message(&JsValue::from_str("Hello from Rust"));
+        // let _ = global_scope.post_message(&JsValue::from_serde(&dbg_msg).unwrap_or_default());
+
+        // eval("yourJsFunction();");
     }
 }
 
@@ -166,66 +143,106 @@ impl Component for App {
     type Message = Msg;
     type Properties = ();
 
-    fn create(ctx: &Context<Self>) -> Self {
-        log!("panel create");
-        // let ctx_clone = ctx.link().clone();
-
+    fn create(_ctx: &Context<Self>) -> Self {
         Self { model: MODEL_INIT }
     }
 
     fn update(&mut self, _ctx: &Context<Self>, msg: Self::Message) -> bool {
-        log!("panel update");
+        let envelope: Option<()> = None;
 
-        let outcome = match msg {
-            Msg::UpdateData(new_data) => {
-                log!("Update - new_data");
-                log!(format!("{:?}", &new_data));
-
-                self.model.data = Some(new_data);
-                true
+        let should_render = match msg {
+            Msg::GetEvents => {
+                console::log!("Get events");
+                let message = json! {
+                    {
+                        "envelope": envelope,
+                        "recipient": "yew-debugger-panel",
+                    }
+                };
+                // TODO: Implement error handler
+                let js_value = JsValue::from_serde(&message).unwrap_or_default();
+                let outcome = sendMessage(js_value);
+                true // Return true to cause the displayed change to update
             }
-            Msg::Nil => true,
+            Msg::Nil => false,
         };
-
-        // DEBBUGER_APP.with(|inner| {
-        //     let mut debbuger = inner.borrow_mut();
-        //     let cur_msg_number = debbuger.cur_msg_number().clone();
-        //     debbuger.set_cur_msg(msg.clone());
-        //     debbuger.set_cur_msg_number(cur_msg_number + 1);
-        //     debbuger.set_cur_model(self.model.clone());
-        // });
-        // let debugger = DEBBUGER_APP.with(|inner| inner.borrow().clone());
-        // App::send_to_debugger(debugger.into());
-        outcome
+        DEBBUGER_APP.with(|inner| {
+            let mut debbuger = inner.borrow_mut();
+            let cur_msg_number = debbuger.cur_msg_number().clone();
+            debbuger.set_cur_msg(msg.clone());
+            debbuger.set_cur_msg_number(cur_msg_number + 1);
+            debbuger.set_cur_model(self.model.clone());
+        });
+        let debugger = DEBBUGER_APP.with(|inner| inner.borrow().clone());
+        App::send_to_debugger(debugger.into());
+        should_render
     }
 
     fn view(&self, ctx: &Context<Self>) -> Html {
         let debugger = DEBBUGER_APP.with(|inner| inner.borrow().clone());
 
-        html!(
+        html! {
+
             <div>
-                <div>
-                    <p>{ "Bozo" }</p>
+                <div class="panel">
+                    // A button to send the Increment message
+                    <button class="button" onclick={ctx.link().callback(|_| Msg::GetEvents)}>
+                        { "[ Get Events ]" }
+                    </button>
+
+
+
                 </div>
-                <div>
-                    <p>{ self.model.data.clone() }</p>
-                </div>
-                // <pre>
-                //      {
-                //          debugger.to_string()
-                //      }
-                //  </pre>
+
+                // Display the current value of the counter
+                <p class="counter">
+                    { self.model.counter}
+                </p>
+
+                // Display the current date and time the page was rendered
+                <p class="footer">
+                    <p>
+                    { "Rendered: " }
+                    { String::from(Date::new_0().to_string()) }
+                    </p>
+                    <hr/>
+                    <h2>{ "Debugger: " }</h2>
+                    <pre>
+                    {
+                        debugger.to_string()
+                    }
+                    </pre>
+                    // <p>
+                    // { "COMPONENT: " }
+                    // {
+                    //     debugger.component()
+                    // }
+                    // </p>
+                    // <p>
+                    // { "CURRENT_MSG_NUMBER: " }
+                    // {
+                    //     format!("{:?}",debugger.cur_msg_number())
+                    // }
+                    // </p>
+                    // <p>
+                    // { "CURRENT_MSG: " }
+                    // {
+                    //     format!("{:?}",debugger.cur_msg())
+                    // }
+                    // </p>
+                    // <p>
+                    // { "CURRENT_MODEL: " }
+                    // {
+                    //     format!("{:?}",debugger.cur_model())
+                    // }
+                    // </p>
+                </p>
             </div>
-        )
+        }
     }
 }
 
 #[wasm_bindgen(start)]
 pub fn main() {
     yew::Renderer::<App>::new().render();
-
-    // let yew_main = gloo::utils::document()
-    //     .get_element_by_id("devtools-panel-main")
-    //     .unwrap();
-    // yew::Renderer::<App>::with_root(yew_main).render();
 }

@@ -1,4 +1,4 @@
-import init, { print, print_with_value, receive_evelope } from './background/background.js';
+import init, { print, print_with_value, receive_envelope } from './background/background.js';
 
 chrome.runtime.onInstalled.addListener(() => {
   runDemo();
@@ -21,32 +21,68 @@ chrome.runtime.onMessage.addListener(
       "from a content script:" + sender.tab.url :
       "from the extension");
 
-    if (message["recipient"] === "yew-debugger") {
-      const envelope = message["envelope"] || null;
+    const recipient = message["recipient"] || null;
 
-      const message_to_send = {
-        "message": JSON.stringify(envelope)
-      };
+    console.info(recipient);
 
-      // chrome.storage.local.get({ events: [] }, function (result) {
-      //   // the input argument is ALWAYS an object containing the queried keys
-      //   // so we select the key we need
-      //   var events = result.events;
-      //   events.push(JSON.stringify(envelope));
-      //   // set the new array value to the same key
-      //   chrome.storage.local.set({ events: events }, function () {
-      //     // you can use strings instead of objects
-      //     // if you don't  want to define default values
-      //     chrome.storage.local.get('events', function (result) {
-      //       console.log(result.events)
-      //     });
-      //   });
-      // });
-
-
-      //* Call the exported functions from the background WASM module
-      const response_from_background_wasm = receive_evelope(message_to_send);
-      sendResponse(response_from_background_wasm);
+    switch (recipient) {
+      case 'yew-debugger':
+        handleMessageFromContentScript(sender, message, sendResponse)
+        break
+      case 'yew-debugger-panel':
+        handleMessageFromPanel(sender, message, sendResponse)
+        break
+      default:
+        break
     }
   }
 );
+
+function handleMessageFromContentScript(sender, message, sendResponse) {
+  console.log("handleMessageFromContentScript");
+  console.log(message)
+  const envelope = message["envelope"] || null;
+
+  const message_to_send = {
+    "message": JSON.stringify(envelope)
+  };
+
+  //* Call the exported functions from the background WASM module
+  const response_from_background_wasm = receive_envelope(message_to_send);
+  sendResponse(response_from_background_wasm);
+}
+
+function handleMessageFromPanel(sender, message, sendResponse) {
+  console.log("handleMessageFromPanel");
+  console.log(message)
+  const senderId = sender["id"] || null;
+  const senderOrigin = sender["origin"] || null;
+  console.log(senderId, senderOrigin)
+
+  const urlParts = senderOrigin.split('://');
+  const urlScheme = urlParts[0] || null;
+  const urlHostname = urlParts[1] || null;
+  // console.log(urlScheme, urlHostname)
+  if (urlScheme === "chrome-extension" && senderId === urlHostname) {
+    console.log("Accepted message")
+    const envelope = message["envelope"] || null;
+
+    const message_to_send = {
+      "message": envelope
+    };
+
+    //* Call the exported functions from the background WASM module
+    const response_from_background_wasm = receive_envelope(JSON.stringify(message_to_send));
+    const outcome = JSON.parse(response_from_background_wasm)
+    console.log(outcome)
+    sendResponse(outcome);
+  } else {
+    const message_to_send = {
+      "message": "Error: Invalid origin for panel.html API"
+    };
+    console.log(message_to_send)
+    sendResponse(message_to_send)
+  }
+
+
+}

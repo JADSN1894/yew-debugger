@@ -55,3 +55,26 @@ pub fn receive_evelope(input: JsValue) -> Result<JsValue, JsValue> {
         }
     }
 }
+
+// fn do_something() {
+// let closure = Closure::wrap(Box::new(move |message: JsValue, _: JsValue, _: JsValue| {
+//     log!("create closure -> message");
+
+//     match serde_wasm_bindgen::from_value::<EnvelopeWrapper>(message) {
+//         Ok(envelope) => {
+//             log!("&envelope");
+//             log!(format!("{:?}", &envelope));
+//             ctx_clone.send_message(Msg::UpdateData(envelope.clone()));
+//         }
+//         Err(error) => {
+//             log!("ERROR");
+//             log!(error.to_string());
+//         }
+//     };
+// }) as Box<dyn FnMut(JsValue, JsValue, JsValue)>);
+
+// addListener(&closure.as_ref().unchecked_ref());
+
+// Prevent the closure from being dropped
+// closure.forget();
+// }

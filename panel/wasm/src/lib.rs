@@ -4,7 +4,7 @@ mod traits;
 
 use crate::traits::Name;
 use gloo::console::log;
-use js_sys::Function;
+
 use serde::{Deserialize, Serialize};
 use serde_json::{json, Value};
 use std::{
@@ -12,26 +12,8 @@ use std::{
     fmt::{Debug, Display},
     marker::PhantomData,
 };
-use wasm_bindgen::{
-    prelude::{wasm_bindgen, Closure},
-    JsCast, JsValue,
-};
+use wasm_bindgen::prelude::wasm_bindgen;
 use yew::{html, Component, Context, Html, ToHtml};
-
-// #[wasm_bindgen]
-// extern "C" {
-//     #[wasm_bindgen(js_namespace = ["chrome.runtime"])]
-//     fn sendMessage(message: JsValue);
-
-//     #[wasm_bindgen(js_namespace = ["chrome.runtime.onMessage"])]
-//     fn addListener(callback: &Function);
-
-//     #[wasm_bindgen(js_namespace = ["chrome.storage.local.get"])]
-//     fn get(keys: JsValue);
-
-//     #[wasm_bindgen(js_namespace = ["chrome.storage.local.set"])]
-//     fn set(items: JsValue, func: &Function);
-// }
 
 const MODEL_INIT: Model = Model { data: None };
 
@@ -186,29 +168,7 @@ impl Component for App {
 
     fn create(ctx: &Context<Self>) -> Self {
         log!("panel create");
-
-        let ctx_clone = ctx.link().clone();
-
-        let closure = Closure::wrap(Box::new(move |message: JsValue, _: JsValue, _: JsValue| {
-            log!("create closure -> message");
-
-            match serde_wasm_bindgen::from_value::<EnvelopeWrapper>(message) {
-                Ok(envelope) => {
-                    log!("&envelope");
-                    log!(format!("{:?}", &envelope));
-                    ctx_clone.send_message(Msg::UpdateData(envelope.clone()));
-                }
-                Err(error) => {
-                    log!("ERROR");
-                    log!(error.to_string());
-                }
-            };
-        }) as Box<dyn FnMut(JsValue, JsValue, JsValue)>);
-
-        addListener(&closure.as_ref().unchecked_ref());
-
-        // Prevent the closure from being dropped
-        closure.forget();
+        // let ctx_clone = ctx.link().clone();
 
         Self { model: MODEL_INIT }
     }

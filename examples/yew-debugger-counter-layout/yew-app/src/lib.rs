@@ -40,14 +40,14 @@ pub struct App {
 }
 
 impl App {
-    fn send_to_debugger(envelope: Value) {
+    fn send_to_debugger(event: Value) {
         // let msg_id = MSG_ID.with(|inner| inner.borrow().load(Ordering::SeqCst));
 
-        let recipient = "yew-debugger";
+        let api = "yew-debugger-collector";
         let dbg_msg = json! {
         {
-            "recipient": recipient,
-            "envelope": envelope,
+            "api": api,
+            "event": event,
         }
 
         };

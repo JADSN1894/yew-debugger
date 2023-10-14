@@ -6,6 +6,8 @@ use crate::traits::Name;
 use gloo::console;
 use gloo::utils::format::JsValueSerdeExt;
 use js_sys::Date;
+use js_sys::Function;
+use serde::Deserialize;
 use serde::Serialize;
 use serde_json::json;
 use serde_json::Value;
@@ -31,7 +33,7 @@ thread_local! {
 #[wasm_bindgen]
 extern "C" {
     #[wasm_bindgen(js_namespace = ["chrome.runtime"])]
-    fn sendMessage(message: JsValue);
+    fn sendMessage(message: JsValue, callback: &Function);
 }
 
 impl_name! {App}
@@ -119,6 +121,26 @@ pub struct Model {
     counter: i32,
 }
 
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct MessageOutcome {
+    #[serde(rename = "isOk")]
+    is_ok: bool,
+    data: Option<Vec<Event>>,
+    error: Option<String>,
+}
+#[wasm_bindgen]
+#[derive(Debug, Clone, Deserialize, Serialize)]
+pub struct Event {
+    metadata: EventMetadata,
+    model: Value,
+}
+
+#[wasm_bindgen]
+#[derive(Debug, Clone, Deserialize, Serialize)]
+pub struct EventMetadata {
+    msg: String,
+    msg_id: u32,
+}
 impl App {
     fn send_to_debugger(envelope: Value) {
         let recipient = "yew-debugger";
@@ -148,20 +170,56 @@ impl Component for App {
     }
 
     fn update(&mut self, _ctx: &Context<Self>, msg: Self::Message) -> bool {
-        let envelope: Option<()> = None;
+        // let command: Option<()> = None;
+
+        let command = json!(
+            {
+                "name": "GetEvents",
+                "data": null
+            }
+        );
 
         let should_render = match msg {
             Msg::GetEvents => {
                 console::log!("Get events");
-                let message = json! {
+                let message = json!(
                     {
-                        "envelope": envelope,
-                        "recipient": "yew-debugger-panel",
+                        "command": command,
+                        "api": "yew-debugger-panel",
                     }
-                };
+                );
                 // TODO: Implement error handler
                 let js_value = JsValue::from_serde(&message).unwrap_or_default();
-                let outcome = sendMessage(js_value);
+
+                let closure =
+                    Closure::wrap(Box::new(move |message: JsValue, _: JsValue, _: JsValue| {
+                        console::log!("create closure -> message");
+
+                        match serde_wasm_bindgen::from_value::<MessageOutcome>(message) {
+                            Ok(envelope) => {
+                                console::log!("&envelope");
+                                console::log!(format!("{:?}", &envelope));
+                                // ctx_clone.send_message(Msg::UpdateData(envelope.clone()));
+                            }
+                            Err(error) => {
+                                console::log!("ERROR");
+                                console::log!(error.to_string());
+                            }
+                        };
+                    })
+                        as Box<dyn FnMut(JsValue, JsValue, JsValue)>);
+
+                // addListener(&closure.as_ref().unchecked_ref());
+
+                // Prevent the closure from being dropped
+                // closure.forget();
+
+                console::log!("panel_wasm::sendMessage::js_value");
+                console::log!(&js_value);
+                sendMessage(js_value, &closure.as_ref().unchecked_ref());
+
+                closure.forget();
+
                 true // Return true to cause the displayed change to update
             }
             Msg::Nil => false,
@@ -192,11 +250,11 @@ impl Component for App {
                         {(0..=50).enumerate().map(|(index, item)| {
                             html!(
                                 <div class="collapse bg-base-200">
-                                    <input type="checkbox" /> 
+                                    <input type="checkbox" />
                                     <div class="collapse-title text-xl font-medium">
                                      {format!("{index} Item - {item}")}
                                     </div>
-                                    <div class="collapse-content"> 
+                                    <div class="collapse-content">
                                       <p>{ debugger.to_string() }</p>
                                     </div>
                                   </div>

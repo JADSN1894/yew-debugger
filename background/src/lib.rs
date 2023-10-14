@@ -1,6 +1,7 @@
 use gloo::console::log;
 use js_sys::Function;
 use serde::{Deserialize, Serialize};
+use serde_json::{json, Value};
 // use serde_json::{json, Value};
 use wasm_bindgen::{
     prelude::wasm_bindgen,
@@ -36,32 +37,89 @@ pub fn print_with_value(value: &str) {
 }
 
 #[wasm_bindgen]
-#[derive(Debug, Serialize, Deserialize)]
-pub struct Envelope {
-    message: Option<String>,
+#[derive(Debug, Deserialize, Serialize)]
+pub struct Event {
+    metadata: EventMetadata,
+    model: Value,
 }
 
 #[wasm_bindgen]
-pub fn receive_envelope(input: String) -> Result<String, String> {
-    log!("WASM - [{}]: receive_envelope", file!());
+#[derive(Debug, Deserialize, Serialize)]
+pub struct EventMetadata {
+    msg: String,
+    msg_id: u32,
+}
+
+#[wasm_bindgen]
+pub fn yew_debugger_collector(input: String) -> Result<String, String> {
+    log!("WASM - [{}]: yew_debugger_collector", file!());
     log!(&input);
-    match serde_json::from_str::<Envelope>(&input) {
+    match serde_json::from_str::<EventMetadata>(&input) {
         Ok(inner_envelope) => {
             log!(format!("{:?}", &inner_envelope));
             serde_json::to_string(&inner_envelope).map_err(|err| err.to_string())
         }
         Err(error) => {
-            let mut envelope = Envelope {
-                message: Some(error.to_string()),
-            };
-            envelope.message = Some(error.to_string());
+            let envelope = json!({
+                "inputError": error.to_string()
+            });
 
             serde_json::to_string(&envelope).map_err(|err| err.to_string())
         }
     }
-    // match serde_wasm_bindgen::from_value::<Envelope>(input) {
-    // }
 }
+
+#[derive(Debug, Deserialize)]
+pub struct Command {
+    name: PanelCommand,
+    data: Option<String>,
+}
+
+#[derive(Debug, Deserialize)]
+pub enum PanelCommand {
+    GetEvents,
+}
+#[wasm_bindgen]
+pub fn yew_debugger_panel(input: String) -> Result<String, String> {
+    log!("WASM - [{}]: yew_debugger_collector", file!());
+    log!(&input);
+    match serde_json::from_str::<EventMetadata>(&input) {
+        Ok(inner_envelope) => {
+            log!(format!("{:?}", &inner_envelope));
+            serde_json::to_string(&inner_envelope).map_err(|err| err.to_string())
+        }
+        Err(error) => {
+            let envelope = json!({
+                "error": error.to_string()
+            });
+
+            serde_json::to_string(&envelope).map_err(|err| err.to_string())
+        }
+    }
+}
+
+// #[wasm_bindgen]
+// pub fn receive_envelope(input: String) -> Result<String, String> {
+//     log!("WASM - [{}]: receive_envelope", file!());
+//     log!(&input);
+//     match serde_json::from_str::<Envelope>(&input) {
+//         Ok(inner_envelope) => {
+//             log!(format!("{:?}", &inner_envelope));
+//             serde_json::to_string(&inner_envelope).map_err(|err| err.to_string())
+//         }
+//         Err(error) => {
+//             let mut envelope = Envelope {
+//                 message: Some(error.to_string()),
+//             };
+//             envelope.message = Some(error.to_string());
+
+//             serde_json::to_string(&envelope).map_err(|err| err.to_string())
+//         }
+//     }
+// }
+
+// match serde_wasm_bindgen::from_value::<Envelope>(input) {
+// }
 
 // fn do_something() {
 // let closure = Closure::wrap(Box::new(move |message: JsValue, _: JsValue, _: JsValue| {

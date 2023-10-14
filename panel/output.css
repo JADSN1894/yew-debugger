@@ -1529,6 +1529,11 @@ details.collapse summary::-webkit-details-marker {
   font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
 }
 
+.\!text-4xl {
+  font-size: 2.25rem !important;
+  line-height: 2.5rem !important;
+}
+
 .text-xl {
   font-size: 1.25rem;
   line-height: 1.75rem;
@@ -1549,11 +1554,6 @@ details.collapse summary::-webkit-details-marker {
 .text-error-content {
   --tw-text-opacity: 1;
   color: hsl(var(--erc) / var(--tw-text-opacity));
-}
-
-.text-primary {
-  --tw-text-opacity: 1;
-  color: hsl(var(--p) / var(--tw-text-opacity));
 }
 
 .text-primary-content {

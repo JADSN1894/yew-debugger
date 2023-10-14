@@ -2,36 +2,20 @@
 mod macros;
 mod traits;
 
-use crate::traits::Name;
-use gloo::console;
-use gloo::console::log;
-use gloo::utils::format::JsValueSerdeExt;
-use js_sys::Date;
+use gloo::{console::log, utils::format::JsValueSerdeExt};
 use js_sys::Function;
-use serde::Deserialize;
-use serde::Serialize;
-use serde_json::json;
-use serde_json::Value;
-use std::fmt::{Debug, Display};
-use std::{cell::RefCell, marker::PhantomData};
-use wasm_bindgen::prelude::*;
-use wasm_bindgen::{JsCast, JsValue};
-use web_sys::{DedicatedWorkerGlobalScope, MessageEvent};
-use yew::ToHtml;
+use serde::{Deserialize, Serialize};
+use serde_json::{json, Value};
+use wasm_bindgen::{
+    prelude::{wasm_bindgen, Closure},
+    JsCast, JsValue,
+};
 use yew::{html, Component, Context, Html};
 
 #[wasm_bindgen]
 extern "C" {
     #[wasm_bindgen(js_namespace = ["chrome.runtime"])]
     fn sendMessage(message: JsValue, callback: &Function);
-}
-
-#[derive(Debug, Clone)]
-pub struct MVUDebbuger<C> {
-    component: PhantomData<C>,
-    cur_msg_number: usize,
-    cur_msg: Msg,
-    cur_model: Model,
 }
 
 #[derive(Debug, Clone, Serialize)]
@@ -103,7 +87,7 @@ impl Component for App {
 
         let should_render = match msg {
             Msg::GetEvents => {
-                console::log!("Get events");
+                log!("Get events");
                 let message = json!(
                     {
                         "command": command,
@@ -117,17 +101,17 @@ impl Component for App {
 
                 let closure =
                     Closure::wrap(Box::new(move |message: JsValue, _: JsValue, _: JsValue| {
-                        console::log!("create closure -> message");
+                        log!("create closure -> message");
 
                         match serde_wasm_bindgen::from_value::<MessageOutcome>(message) {
                             Ok(envelope) => {
-                                console::log!("&envelope");
-                                console::log!(format!("{:?}", &envelope));
+                                log!("&envelope");
+                                log!(format!("{:?}", &envelope));
                                 ctx_clone.send_message(Msg::UpdateDebuggerInView(envelope));
                             }
                             Err(error) => {
-                                console::log!("ERROR");
-                                console::log!(error.to_string());
+                                log!("ERROR");
+                                log!(error.to_string());
                             }
                         };
                     })
@@ -138,8 +122,8 @@ impl Component for App {
                 // Prevent the closure from being dropped
                 // closure.forget();
 
-                console::log!("panel_wasm::sendMessage::js_value");
-                console::log!(&js_value);
+                log!("panel_wasm::sendMessage::js_value");
+                log!(&js_value);
                 sendMessage(js_value, &closure.as_ref().unchecked_ref());
 
                 closure.forget();
@@ -159,9 +143,9 @@ impl Component for App {
     }
 
     fn view(&self, ctx: &Context<Self>) -> Html {
-        // let debugger = DEBBUGER_APP.with(|inner| inner.borrow().clone());
-        let MessageOutcome { is_ok, data, error } = self.model().message_outcome();
-
+        let model = self.model();
+        let model_view = serde_json::to_string_pretty(&model).unwrap_or_default();
+        let MessageOutcome { is_ok, data, error } = model.message_outcome();
         html!(
             <div class="h-full w-full p-4">
                 <div class="flex flex-col w-full gap-y-2">
@@ -169,34 +153,43 @@ impl Component for App {
                         { "[ Get Events ]" }
                     </button>
                     if is_ok.clone() == false && data.is_none() && error.is_none() {
-                        <pre class="text-primary-content"><code>{format!("{:?}", self.model())}</code></pre>
+                        <pre class="text-primary-content"><code>{model_view}</code></pre>
                     } else {
                         <div class="flex flex-col gap-y-2">
                             {
                                 if is_ok.clone() == true && error.is_none() {
                                     if let Some(message_outcome_inner_data) = data {
-                                        html!(
-                                            {
-                                                message_outcome_inner_data.into_iter().rev().map(|event_item| {
-                                                    let event_item_metadata = event_item.metadata.clone();
-                                                    let event_item_model = event_item.model.clone();
-                                                    let event_item_model_view = serde_json::to_string_pretty(&event_item_model).unwrap_or_default();
-                                                    html!(
-                                                        <div class="collapse bg-base-200">
-                                                            <input type="checkbox" />
-                                                            <div class="collapse-title text-xl font-medium">
-                                                                {format!("{} :: {}", event_item_metadata.msg, event_item_metadata.msg_id)}
+                                        if message_outcome_inner_data.is_empty() {
+                                            html!(<h1 class="!text-4xl text-primary-content font-bold font-mono uppercase">{"No events"}</h1>)
+                                        } else {
+                                            html!(
+                                                {
+                                                    message_outcome_inner_data.into_iter().rev().map(|event_item| {
+                                                        let event_item_metadata = event_item.metadata.clone();
+                                                        let event_item_model = event_item.model.clone();
+                                                        let event_item_model_view = serde_json::to_string_pretty(&event_item_model).unwrap_or_default();
+                                                        html!(
+                                                            <div class="collapse bg-base-200">
+                                                                <input type="checkbox" />
+                                                                <div class="collapse-title text-xl font-medium">
+                                                                    {format!("{} :: {}", event_item_metadata.msg, event_item_metadata.msg_id)}
+                                                                </div>
+                                                                <div class="collapse-content">
+                                                                    <pre class="text-primary-content"><code>{event_item_model_view}</code></pre>
+                                                                </div>
                                                             </div>
-                                                            <div class="collapse-content">
-                                                                <pre class="text-primary-content"><code>{event_item_model_view}</code></pre>
-                                                            </div>
-                                                        </div>
-                                                    )
-                                                }).collect::<Html>()
-                                            }
-                                        )
+                                                        )
+                                                    }).collect::<Html>()
+                                                }
+                                            )
+                                        }
                                     } else {
-                                        html!(<h1 class="text-primary font-bold font-mono uppercase">{"No events"}</h1>)
+                                        html!(
+                                            <div>
+                                                <h1 class="text-primary-content font-bold font-mono uppercase">{"Impossible state"}</h1>
+                                                <pre class="text-primary-content"><code>{model_view}</code></pre>
+                                            </div>
+                                        )
                                     }
                                 } else if is_ok.clone() == false && error.is_some() {
                                     if let Some(message_outcome_error) = error {
@@ -205,7 +198,7 @@ impl Component for App {
                                         html!(
                                             <div>
                                                 <h1 class="text-primary-content font-bold font-mono uppercase">{"Impossible state"}</h1>
-                                                <pre class="text-primary-content"><code>{format!("{:?}", self.model())}</code></pre>
+                                                <pre class="text-primary-content"><code>{model_view}</code></pre>
                                             </div>
                                         )
                                     }
@@ -213,7 +206,7 @@ impl Component for App {
                                     html!(
                                         <div>
                                             <h1 class="text-primary-content font-bold font-mono uppercase">{"Impossible state"}</h1>
-                                            <pre class="text-primary-content"><code>{format!("{:?}", self.model())}</code></pre>
+                                            <pre class="text-primary-content"><code>{model_view}</code></pre>
                                         </div>
                                     )
                                 }

@@ -2,11 +2,13 @@
   "name": "node-starter",
   "version": "0.0.0",
   "scripts": {
+    "tailwind": "./tailwindcss -i ./input.css -o ./output.css",
     "dev": "vite",
-    "build": "vite build",
-    "serve": "vite preview"
+    "build": "npm run tailwind && vite build",
+    "preview": "npm run build && vite preview"
   },
   "devDependencies": {
+    "@tailwindcss/typography": "0.5.10",
     "autoprefixer": "10.4.16",
     "daisyui": "3.9.2",
     "postcss": "8.4.31",

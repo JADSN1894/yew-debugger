@@ -1,7 +1,13 @@
 module.exports = {
-  content: ['./src/**/*.{vue,js,ts}'],
+  content: [
+    "./index.html",
+    "./wasm/**/*.rs"
+  ],
   daisyui: {
-    themes: ["light"],
+    themes: ["light", "dark"],
   },
-  plugins: [require('daisyui')],
+  plugins: [
+    require("@tailwindcss/typography"),
+    require("daisyui")
+  ],
 };

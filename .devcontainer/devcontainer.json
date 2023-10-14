@@ -44,7 +44,8 @@
 				"serayuzgur.crates",
 				"tamasfe.even-better-toml",
 				"TechTheAwesome.rust-yew",
-				"tkcandrade.code-annotation"
+				"tkcandrade.code-annotation",
+				"bradlc.vscode-tailwindcss"
 			],
 			"settings": {
 				"editor.formatOnSave": true,

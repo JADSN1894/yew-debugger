@@ -183,60 +183,71 @@ impl Component for App {
 
         html! {
 
-            <div>
-                <div class="panel">
-                    // A button to send the Increment message
-                    <button class="button" onclick={ctx.link().callback(|_| Msg::GetEvents)}>
+            <div class="h-full w-full m-4">
+                <div class="flex flex-col w-full gap-y-2">
+                    <button class="w-full btn btn-sm btn-accent" onclick={ctx.link().callback(|_| Msg::GetEvents)}>
                         { "[ Get Events ]" }
                     </button>
-
-
-
+                    <div class="flex flex-col gap-y-2">
+                        {(0..=50).enumerate().map(|(index, item)| {
+                            html!(
+                                <div class="collapse bg-base-200">
+                                    <input type="checkbox" /> 
+                                    <div class="collapse-title text-xl font-medium">
+                                     {format!("{index} Item - {item}")}
+                                    </div>
+                                    <div class="collapse-content"> 
+                                      <p>{ debugger.to_string() }</p>
+                                    </div>
+                                  </div>
+                            )
+                        }).collect::<Html>()}
+                    </div>
                 </div>
 
                 // Display the current value of the counter
-                <p class="counter">
-                    { self.model.counter}
-                </p>
+                // <p class="counter">
+                //     { self.model.counter}
+                // </p>
 
                 // Display the current date and time the page was rendered
-                <p class="footer">
-                    <p>
-                    { "Rendered: " }
-                    { String::from(Date::new_0().to_string()) }
-                    </p>
-                    <hr/>
-                    <h2>{ "Debugger: " }</h2>
+                // <p class="footer">
+                //     <p>
+                //     { "Rendered: " }
+                //     { String::from(Date::new_0().to_string()) }
+                //     </p>
+                //     <hr/>
+                //     <h2>{ "Debugger: " }</h2>
                     <pre>
                     {
                         debugger.to_string()
                     }
                     </pre>
-                    // <p>
-                    // { "COMPONENT: " }
-                    // {
-                    //     debugger.component()
-                    // }
-                    // </p>
-                    // <p>
-                    // { "CURRENT_MSG_NUMBER: " }
-                    // {
-                    //     format!("{:?}",debugger.cur_msg_number())
-                    // }
-                    // </p>
-                    // <p>
-                    // { "CURRENT_MSG: " }
-                    // {
-                    //     format!("{:?}",debugger.cur_msg())
-                    // }
-                    // </p>
-                    // <p>
-                    // { "CURRENT_MODEL: " }
-                    // {
-                    //     format!("{:?}",debugger.cur_model())
-                    // }
-                    // </p>
-                </p>
+                //     // <p>
+                //     // { "COMPONENT: " }
+                //     // {
+                //     //     debugger.component()
+                //     // }
+                //     // </p>
+                //     // <p>
+                //     // { "CURRENT_MSG_NUMBER: " }
+                //     // {
+                //     //     format!("{:?}",debugger.cur_msg_number())
+                //     // }
+                //     // </p>
+                //     // <p>
+                //     // { "CURRENT_MSG: " }
+                //     // {
+                //     //     format!("{:?}",debugger.cur_msg())
+                //     // }
+                //     // </p>
+                //     // <p>
+                //     // { "CURRENT_MODEL: " }
+                //     // {
+                //     //     format!("{:?}",debugger.cur_model())
+                //     // }
+                //     // </p>
+                // </p>
             </div>
         }
     }

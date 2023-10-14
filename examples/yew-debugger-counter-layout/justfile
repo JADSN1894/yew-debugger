@@ -9,3 +9,8 @@ terminal-2:
 # Vite bundler in dev
 terminal-3:
     @npm run dev
+
+# Serve dist folder using python server
+python-server:
+    @npm run build
+    @python3 -m http.server --directory dist

@@ -26,12 +26,10 @@ impl Component for CounterComponent {
     }
 
     fn update(&mut self, ctx: &yew::Context<Self>, msg: Self::Message) -> bool {
-        
         true
     }
 
     fn view(&self, ctx: &yew::Context<Self>) -> yew::Html {
-
         let props = ctx.props();
         html!(
             <div class="flex flex-col flex-grow items-center justify-center gap-y-2 border-warning border-dashed border-2 w-full p-2">
@@ -63,6 +61,4 @@ impl Component for CounterComponent {
 
         )
     }
-
-
 }

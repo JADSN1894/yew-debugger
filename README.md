@@ -1,5 +1,10 @@
 I'm excited to introduce `yew-debugger` – a powerful DevTools extension meticulously designed to enhance your debugging experience with Yew framework applications. Dive deep into your code, diagnose issues, and streamline your development process with ease.
 
+## Screenshot
+
+![Screenshot](docs/yew-debugger-running-with-example.png?raw=true)
+
+
 ## 💪 Motivation
 
 The concept of "making the debug first" in game development is a software development approach that emphasizes creating and implementing debugging tools and systems early in the development process. This approach is also sometimes referred to as "debug-driven development".

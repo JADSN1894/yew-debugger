@@ -2,7 +2,9 @@
 mod macros;
 mod traits;
 
-use gloo::{console::log, utils::format::JsValueSerdeExt};
+use std::rc::Rc;
+
+use gloo::{console::log, timers::callback::Interval, utils::format::JsValueSerdeExt};
 use js_sys::Function;
 use serde::{Deserialize, Serialize};
 use serde_json::{json, Value};
@@ -26,10 +28,11 @@ pub enum Msg {
     ChangeEventCotentOnClick(Event),
 }
 
-#[derive(Debug, Default, Clone)]
+#[derive(Debug)]
 pub struct App {
     model: Model,
-    current_event: Event,
+    current_event: Option<Event>,
+    tick: Interval,
 }
 
 impl App {
@@ -37,16 +40,16 @@ impl App {
         &self.model
     }
 
-    pub fn current_event(&self) -> &Event {
-        &self.current_event
+    pub fn current_event(&self) -> Option<&Event> {
+        self.current_event.as_ref()
     }
 
     pub fn set_current_event(&mut self, current_event: Event) {
-        self.current_event = current_event;
+        self.current_event = Some(current_event);
     }
 }
 
-#[derive(Debug, Default, Clone, Serialize)]
+#[derive(Debug, Default, Clone)]
 pub struct Model {
     message_outcome: MessageOutcome,
 }
@@ -61,11 +64,26 @@ impl Model {
 pub struct MessageOutcome {
     #[serde(rename = "isOk")]
     is_ok: bool,
-    data: Option<Vec<Event>>,
-    error: Option<String>,
+    #[serde(rename = "data")]
+    maybe_data: Option<Vec<Event>>,
+    maybe_error: Option<String>,
 }
 
-#[derive(Debug, Default, Clone, Deserialize, Serialize)]
+impl MessageOutcome {
+    pub fn is_ok(&self) -> bool {
+        self.is_ok
+    }
+
+    pub fn maybe_outcome(&self) -> Option<&Vec<Event>> {
+        self.maybe_data.as_ref()
+    }
+
+    pub fn maybe_error(&self) -> Option<&String> {
+        self.maybe_error.as_ref()
+    }
+}
+
+#[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct Event {
     metadata: EventMetadata,
     model: Value,
@@ -81,7 +99,7 @@ impl Event {
     }
 }
 
-#[derive(Debug, Default, Clone, Deserialize, Serialize)]
+#[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct EventMetadata {
     msg: String,
     msg_id: u32,
@@ -101,8 +119,16 @@ impl Component for App {
     type Message = Msg;
     type Properties = ();
 
-    fn create(_ctx: &Context<Self>) -> Self {
-        Default::default()
+    fn create(ctx: &Context<Self>) -> Self {
+        let tick = {
+            let link = ctx.link().clone();
+            Interval::new(100, move || link.send_message(Msg::GetEvents))
+        };
+        Self {
+            tick,
+            model: Default::default(),
+            current_event: Default::default(),
+        }
     }
 
     fn update(&mut self, ctx: &Context<Self>, msg: Self::Message) -> bool {
@@ -117,7 +143,7 @@ impl Component for App {
 
         let should_render = match msg {
             Msg::GetEvents => {
-                log!("Get events");
+                // log!("Get events");
                 let message = json!(
                     {
                         "command": command,
@@ -147,13 +173,8 @@ impl Component for App {
                     })
                         as Box<dyn FnMut(JsValue, JsValue, JsValue)>);
 
-                // addListener(&closure.as_ref().unchecked_ref());
-
-                // Prevent the closure from being dropped
-                // closure.forget();
-
-                log!("panel_wasm::sendMessage::js_value");
-                log!(&js_value);
+                // log!("panel_wasm::sendMessage::js_value");
+                // log!(&js_value);
                 sendMessage(js_value, &closure.as_ref().unchecked_ref());
 
                 closure.forget();
@@ -178,40 +199,69 @@ impl Component for App {
 
     fn view(&self, ctx: &Context<Self>) -> Html {
         let model = self.model().clone();
-        let model_view = serde_json::to_string_pretty(&model).unwrap_or_default();
-        let MessageOutcome { is_ok, data, error } = model.message_outcome().clone();
+        let MessageOutcome {
+            is_ok,
+            maybe_data,
+            maybe_error,
+        } = model.message_outcome().clone();
+
         html!(
             <main class="h-full w-full p-4">
                 <div class="flex flex-col w-full gap-y-2">
                     <div class="relative">
-                        <button class="text-accent-content font-mono fixed top-2 px-4 w-full btn btn-sm btn-accent" onclick={ctx.link().callback(|_| Msg::GetEvents)}>
-                            { "[ Get Events ]" }
-                        </button>
+                        // <button class="text-accent-content font-mono fixed top-2 px-4 w-full btn btn-sm btn-accent" onclick={ctx.link().callback(|_| Msg::GetEvents)}>
+                        //     { "[ Get Events ]" }
+                        // </button>
                     </div>
-                    if is_ok.clone() == false && data.is_none() && error.is_none() {
-                        <pre class="pt-6 text-primary-content font-mono"><code>{model_view}</code></pre>
-                    } else {
+                    // if is_ok.clone() == false && data.is_none() && error.is_none() {
+                    //     <pre class="pt-6 text-primary-content font-mono"><code>{model_view}</code></pre>
+                    // } else {
                         <div class="flex pt-6">
                             <div class="w-[30%]">
+                                <>
                                 {
-                                    if is_ok.clone() == true && error.is_none() {
-                                        if let Some(message_outcome_inner_data) = data {
-                                            if message_outcome_inner_data.is_empty() {
-                                                html!(<h1 class="!text-4xl text-primary-content font-bold font-mono uppercase">{"No events"}</h1>)
+
+                                    if is_ok && maybe_data.is_some() {
+                                        if let Some(events) = maybe_data {
+                                            if events.is_empty() {
+                                                html!(<h1 class="!text-4xl text-base-content font-bold font-mono uppercase">{"No events"}</h1>)
                                             } else {
                                                 html!(
+                                                    // TODO
                                                     /* FIX - [JADSN]: Height base on user height size */
                                                     <div class="pr-1 h-[600px] overflow-y-auto">
                                                         <div class="flex flex-col  w-full gap-y-2 ">
                                                         {
-                                                            message_outcome_inner_data.into_iter().rev().map(|event_item| {
-                                                                let event_item_metadata = event_item.metadata.clone();
-                                                                html!(
-                                                                    <button class="flex items-center justify-between h-12 p-2 rounded-lg bg-primary text-primary-content hover:bg-primary-focus" onclick={ctx.link().callback(move |_| Msg::ChangeEventCotentOnClick(event_item.clone()))}>
-                                                                        <span class="font-mono font-bold uppercase">{event_item_metadata.msg}</span>
-                                                                        <span class="font-mono font-bold uppercase">{event_item_metadata.msg_id}</span>
-                                                                    </button>
-                                                                )
+                                                            events.into_iter().rev().map(|event_item| {
+                                                                let cur_event_item = event_item.clone();
+                                                                let my_callback = move |_| Msg::ChangeEventCotentOnClick(cur_event_item.clone());
+                                                                let msg = event_item.metadata().msg();
+                                                                let msg_id = event_item.metadata().msg_id();
+                                                                if let Some(current_event) = self.current_event() {
+                                                                    if current_event.metadata().msg_id() == msg_id {
+                                                                        html!(
+                                                                            <button class="flex items-center justify-between h-12 p-2 rounded-lg bg-warning text-base-content hover:bg-warning-focus" onclick={ctx.link().callback(my_callback)}>
+                                                                                <span class="font-mono font-bold uppercase">{msg}</span>
+                                                                                <span class="font-mono font-bold uppercase">{msg_id}</span>
+                                                                            </button>
+                                                                        )
+                                                                    } else {
+                                                                        html!(
+                                                                            <button class="flex items-center justify-between h-12 p-2 rounded-lg bg-primary text-primary-content hover:bg-primary-focus" onclick={ctx.link().callback(my_callback)}>
+                                                                                <span class="font-mono font-bold uppercase">{msg}</span>
+                                                                                <span class="font-mono font-bold uppercase">{msg_id}</span>
+                                                                            </button>
+                                                                        )
+                                                                    }
+                                                                } else {
+                                                                    html!(
+                                                                        <button class="flex items-center justify-between h-12 p-2 rounded-lg bg-primary text-primary-content hover:bg-primary-focus" onclick={ctx.link().callback(my_callback)}>
+                                                                            <span class="font-mono font-bold uppercase">{msg}</span>
+                                                                            <span class="font-mono font-bold uppercase">{msg_id}</span>
+                                                                        </button>
+                                                                    )
+                                                                }
+
                                                             }).collect::<Html>()
                                                         }
                                                         </div>
@@ -221,47 +271,57 @@ impl Component for App {
                                         } else {
                                             html!(
                                                 <div>
-                                                    <h1 class="text-primary-content font-bold font-mono uppercase">{"Impossible state"}</h1>
-                                                    <pre class="text-primary-content"><code>{model_view}</code></pre>
-                                                </div>
-                                            )
-                                        }
-                                    } else if is_ok.clone() == false && error.is_some() {
-                                        if let Some(message_outcome_error) = error {
-                                            html!(<h1 class="text-error-content font-bold font-mono uppercase">{message_outcome_error}</h1>)
-                                        } else {
-                                            html!(
-                                                <div>
-                                                    <h1 class="text-primary-content font-bold font-mono uppercase">{"Impossible state"}</h1>
-                                                    <pre class="text-primary-content"><code>{model_view}</code></pre>
+                                                    <h1 class="text-error-content font-bold font-mono uppercase">{"Impossible state"}</h1>
                                                 </div>
                                             )
                                         }
                                     } else {
-                                        html!(
-                                            <div>
-                                                <h1 class="text-primary-content font-bold font-mono uppercase">{"Impossible state"}</h1>
-                                                <pre class="text-primary-content"><code>{model_view}</code></pre>
-                                            </div>
-                                        )
+                                        if let Some(message_outcome_error) = maybe_error {
+                                            html!(<h1 class="text-error-content font-bold font-mono uppercase">{message_outcome_error}</h1>)
+                                        } else {
+                                            html!(
+                                                <div>
+                                                    <h1 class="text-error-content font-bold font-mono uppercase">{"Impossible state"}</h1>
+
+                                                </div>
+                                            )
+                                        }
                                     }
                                 }
+                                </>
                             </div>
+                            // TODO
                             /* FIX - [JADSN]: Height base on user height size */
                             <div class="flex flex-col flex-grow pl-1 overflow-y-auto h-[600px]">
                                <div class="flex flex-col">
-                                    <pre class="text-primary-content uppercase font-mono font-bold"><code>{"-- Message"}</code></pre>
-                                    <pre class="text-primary-content py-2 font-mono"><code>{self.current_event().metadata().msg()}</code></pre>
+                                    <pre class="text-primary-content uppercase font-mono font-bold">
+                                        <span>{"-- Message "}</span>
+                                        {self.current_event().map(|cur_event|
+                                            html!(<span class="text-base-content">{cur_event.metadata().msg_id()}</span>))}
+                                    </pre>
+                                    <pre class="text-base-content py-2 font-mono">
+                                        {self.current_event().map(|cur_event| html!(<code>{cur_event.metadata().msg()}</code>))}
+                                    </pre>
                                 </div>
                                 <div class="flex flex-col">
                                     <pre class="text-primary-content uppercase font-mono font-bold"><code>{"-- Model"}</code></pre>
-                                    <pre class="text-primary-content pt-2 font-mono">
-                                        <code>{serde_json::to_string_pretty(&self.current_event().model()).unwrap_or_default()}</code>
+                                    <pre class="text-base-content pt-2 font-mono">
+                                        {
+                                            self.current_event()
+                                                .map(|cur_event| html!(
+                                                        <code>
+                                                            {
+                                                                serde_json::to_string_pretty(cur_event.model()).unwrap_or_default()
+                                                            }
+                                                        </code>
+                                                    )
+                                                )
+                                        }
                                     </pre>
                                 </div>
                             </div>
                         </div>
-                    }
+                    // }
                 </div>
             </main>
         )

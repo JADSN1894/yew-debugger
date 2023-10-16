@@ -200,6 +200,7 @@ impl Component for App {
                                                 html!(<h1 class="!text-4xl text-primary-content font-bold font-mono uppercase">{"No events"}</h1>)
                                             } else {
                                                 html!(
+                                                    /* FIX - [JADSN]: Height base on user height size */
                                                     <div class="pr-1 h-[600px] overflow-y-auto">
                                                         <div class="flex flex-col  w-full gap-y-2 ">
                                                         {
@@ -246,6 +247,7 @@ impl Component for App {
                                     }
                                 }
                             </div>
+                            /* FIX - [JADSN]: Height base on user height size */
                             <div class="flex flex-col flex-grow pl-1 overflow-y-auto h-[600px]">
                                <div class="flex flex-col">
                                     <pre class="text-primary-content uppercase font-mono font-bold"><code>{"-- Message"}</code></pre>

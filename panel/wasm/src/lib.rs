@@ -181,16 +181,18 @@ impl Component for App {
         let model_view = serde_json::to_string_pretty(&model).unwrap_or_default();
         let MessageOutcome { is_ok, data, error } = model.message_outcome().clone();
         html!(
-            <main class="h-full w-full p-4 overflow-hidden">
+            <main class="h-full w-full p-4">
                 <div class="flex flex-col w-full gap-y-2">
-                    <button class="w-full btn btn-sm btn-accent" onclick={ctx.link().callback(|_| Msg::GetEvents)}>
-                        { "[ Get Events ]" }
-                    </button>
+                    <div class="relative">
+                        <button class="text-accent-content font-mono fixed top-2 px-4 w-full btn btn-sm btn-accent" onclick={ctx.link().callback(|_| Msg::GetEvents)}>
+                            { "[ Get Events ]" }
+                        </button>
+                    </div>
                     if is_ok.clone() == false && data.is_none() && error.is_none() {
-                        <pre class="text-primary-content"><code>{model_view}</code></pre>
+                        <pre class="pt-6 text-primary-content font-mono"><code>{model_view}</code></pre>
                     } else {
-                        <div class="flex">
-                            <div class="w-[30%] flex flex-col gap-y-2">
+                        <div class="flex pt-6">
+                            <div class="w-[30%]">
                                 {
                                     if is_ok.clone() == true && error.is_none() {
                                         if let Some(message_outcome_inner_data) = data {
@@ -198,16 +200,21 @@ impl Component for App {
                                                 html!(<h1 class="!text-4xl text-primary-content font-bold font-mono uppercase">{"No events"}</h1>)
                                             } else {
                                                 html!(
-                                                    {
-                                                        message_outcome_inner_data.into_iter().rev().map(|event_item| {
-                                                            let event_item_metadata = event_item.metadata.clone();
-                                                            html!(
-                                                                <button class="btn btn-sm btn-primary" onclick={ctx.link().callback(move |_| Msg::ChangeEventCotentOnClick(event_item.clone()))}>{
-                                                                    format!("{} :: {}", event_item_metadata.msg, event_item_metadata.msg_id)}
-                                                                </button>
-                                                            )
-                                                        }).collect::<Html>()
-                                                    }
+                                                    <div class="pr-1 h-[600px] overflow-y-auto">
+                                                        <div class="flex flex-col  w-full gap-y-2 ">
+                                                        {
+                                                            message_outcome_inner_data.into_iter().rev().map(|event_item| {
+                                                                let event_item_metadata = event_item.metadata.clone();
+                                                                html!(
+                                                                    <button class="flex items-center justify-between h-12 p-2 rounded-lg bg-primary text-primary-content hover:bg-primary-focus" onclick={ctx.link().callback(move |_| Msg::ChangeEventCotentOnClick(event_item.clone()))}>
+                                                                        <span class="font-mono font-bold uppercase">{event_item_metadata.msg}</span>
+                                                                        <span class="font-mono font-bold uppercase">{event_item_metadata.msg_id}</span>
+                                                                    </button>
+                                                                )
+                                                            }).collect::<Html>()
+                                                        }
+                                                        </div>
+                                                    </div>
                                                 )
                                             }
                                         } else {
@@ -239,14 +246,14 @@ impl Component for App {
                                     }
                                 }
                             </div>
-                             <div class="flex flex-col flex-grow pl-1 overflow-y-visible">
+                            <div class="flex flex-col flex-grow pl-1 overflow-y-auto h-[600px]">
                                <div class="flex flex-col">
-                                    <pre class="text-primary-content uppercase"><code>{"-- Message"}</code></pre>
-                                    <pre class="text-primary-content"><code>{self.current_event().metadata().msg()}</code></pre>
+                                    <pre class="text-primary-content uppercase font-mono font-bold"><code>{"-- Message"}</code></pre>
+                                    <pre class="text-primary-content py-2 font-mono"><code>{self.current_event().metadata().msg()}</code></pre>
                                 </div>
                                 <div class="flex flex-col">
-                                    <pre class="text-primary-content uppercase"><code>{"-- Model"}</code></pre>
-                                    <pre class="text-primary-content">
+                                    <pre class="text-primary-content uppercase font-mono font-bold"><code>{"-- Model"}</code></pre>
+                                    <pre class="text-primary-content pt-2 font-mono">
                                         <code>{serde_json::to_string_pretty(&self.current_event().model()).unwrap_or_default()}</code>
                                     </pre>
                                 </div>

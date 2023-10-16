@@ -1168,6 +1168,11 @@ html {
   background-color: hsl(var(--p) / var(--tw-bg-opacity));
 }
 
+.bg-warning {
+  --tw-bg-opacity: 1;
+  background-color: hsl(var(--wa) / var(--tw-bg-opacity));
+}
+
 .p-2 {
   padding: 0.5rem;
 }
@@ -1222,6 +1227,11 @@ html {
 .text-accent-content {
   --tw-text-opacity: 1;
   color: hsl(var(--ac) / var(--tw-text-opacity));
+}
+
+.text-base-content {
+  --tw-text-opacity: 1;
+  color: hsl(var(--bc) / var(--tw-text-opacity));
 }
 
 .text-error-content {

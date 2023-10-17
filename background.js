@@ -1,6 +1,7 @@
 import init, { print, print_with_value, yew_debugger_panel, yew_debugger_collector } from './background/background.js';
 
 var EVENTS_COLLECTOR = []
+var CURRENT_TAB = null
 
 chrome.runtime.onInstalled.addListener(() => {
   runDemo();
@@ -21,6 +22,7 @@ chrome.runtime.onMessage.addListener(
     // console.log(sender.tab ?
     //   "from a content script:" + sender.tab.url :
     //   "from the extension");
+
 
     const api = message["api"] || null;
 
@@ -82,7 +84,16 @@ async function handleMessageFromPanel(sender, message, sendResponse) {
           isOk: true,
           data: EVENTS_COLLECTOR
         });
+        break;
 
+      case "ReloadApplication":
+        chrome.tabs.query({ active: true, currentWindow: true }, function (arrayOfTabs) {
+          chrome.tabs.reload(arrayOfTabs[0].id);
+        });
+        sendResponse({
+          isOk: true,
+          data: EVENTS_COLLECTOR
+        });
         break;
 
       default:
@@ -90,7 +101,6 @@ async function handleMessageFromPanel(sender, message, sendResponse) {
           isOk: false,
           error: null
         });
-        break;
     }
   }
 }

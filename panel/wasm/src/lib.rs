@@ -1,15 +1,22 @@
 #[macro_use]
 mod macros;
+mod models;
 mod traits;
 
-use gloo::{console::log, timers::callback::Interval, utils::format::JsValueSerdeExt};
+use gloo::{
+    console::log,
+    timers::callback::Interval,
+    utils::{document, format::JsValueSerdeExt},
+};
 use js_sys::Function;
+use models::ThemeMode;
 use serde::{Deserialize, Serialize};
 use serde_json::{json, Value};
 use wasm_bindgen::{
     prelude::{wasm_bindgen, Closure},
-    JsCast, JsValue,
+    JsCast, JsValue, UnwrapThrowExt,
 };
+use web_sys::HtmlElement;
 use yew::{classes, html, Component, Context, Html};
 
 #[wasm_bindgen]
@@ -25,6 +32,7 @@ pub enum Msg {
     ResetEvents,
     UpdateDebuggerInView(MessageOutcome),
     ChangeEventCotentOnClick(Event),
+    ToggleThemeMode,
 }
 
 #[derive(Debug)]
@@ -32,6 +40,7 @@ pub struct App {
     model: Model,
     current_event: Option<Event>,
     _tick: Interval,
+    current_theme_mode: ThemeMode,
 }
 
 impl App {
@@ -126,10 +135,25 @@ impl Component for App {
             let link = ctx.link().clone();
             Interval::new(100, move || link.send_message(Msg::GetEvents))
         };
+
+        let html_element = document()
+            .query_selector("html")
+            .transpose()
+            .ok_or("Error on get html tag")
+            .unwrap_throw()
+            .unwrap_throw()
+            .dyn_into::<HtmlElement>()
+            .unwrap_throw();
+
+        html_element
+            .set_attribute("data-theme", ThemeMode::default().into())
+            .unwrap_throw();
+
         Self {
             _tick: tick,
             model: Default::default(),
             current_event: Default::default(),
+            current_theme_mode: Default::default(),
         }
     }
 
@@ -245,6 +269,29 @@ impl Component for App {
                 self.set_current_event(Some(input_inner));
                 true
             }
+            Msg::ToggleThemeMode => {
+                match self.current_theme_mode {
+                    ThemeMode::Dark => self.current_theme_mode = ThemeMode::Light,
+                    ThemeMode::Light => self.current_theme_mode = ThemeMode::Dark,
+                };
+
+                let html_element = document()
+                    .query_selector("html")
+                    .transpose()
+                    .ok_or("Error on get html tag")
+                    .unwrap_throw()
+                    .unwrap_throw()
+                    .dyn_into::<HtmlElement>()
+                    .unwrap_throw();
+
+                html_element
+                    .set_attribute("data-theme", self.current_theme_mode.clone().into())
+                    .unwrap_throw();
+
+                // log!(format!("{:?}", html_element));
+
+                true
+            }
         };
         should_render
     }
@@ -260,11 +307,14 @@ impl Component for App {
         html!(
             <main class="h-full w-full p-4">
                 <div class="flex flex-col w-full gap-y-2">
-                    <div class="relative">
-                        <button class="text-accent-content font-mono fixed top-2 px-4 w-full btn btn-sm btn-accent" onclick={ctx.link().callback(|_| Msg::ResetEvents)}>
-                            { "[ Reset Events ]" }
-                        </button>
-                    </div>
+                        <div class="flex w-full justify-between items-center">
+                            <button class="text-accent-content font-mono px-4 btn btn-sm btn-accent" onclick={ctx.link().callback(|_| Msg::ResetEvents)}>
+                                { "[ Reset Events ]" }
+                            </button>
+                            <div>
+                                <input type="checkbox" class="toggle toggle-primary" onchange={ctx.link().callback(|_| Msg::ToggleThemeMode)} checked={self.current_theme_mode.clone().into()} />
+                            </div>
+                        </div>
                     // if is_ok.clone() == false && data.is_none() && error.is_none() {
                     //     <pre class="pt-6 text-primary-content font-mono"><code>{model_view}</code></pre>
                     // } else {
@@ -279,9 +329,8 @@ impl Component for App {
                                                 html!(<h1 class="!text-4xl text-base-content font-bold font-mono uppercase">{"No events"}</h1>)
                                             } else {
                                                 html!(
-                                                    // TODO: FIX - [JADSN]: Height base on user height size
-                                                    <div class="pr-1 h-[600px] overflow-y-auto">
-                                                        <div class="flex flex-col w-full gap-y-2">
+                                                    <div class="h-screen">
+                                                        <div class="pr-1 flex flex-col w-full gap-y-2 h-4/5 overflow-y-auto">
                                                         {
                                                             events.into_iter().rev().map(|event_item| {
                                                                 let cur_event_item = event_item.clone();
@@ -364,7 +413,7 @@ impl Component for App {
                                                 self
                                                     .current_event()
                                                     .map(|cur_event|
-    
+
                                                         html!(
                                                             <code>
                                                                 {

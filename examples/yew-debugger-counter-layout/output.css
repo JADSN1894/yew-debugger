@@ -1411,16 +1411,8 @@ html {
   display: flex;
 }
 
-.h-\[750px\] {
-  height: 750px;
-}
-
 .h-screen {
   height: 100vh;
-}
-
-.w-\[400px\] {
-  width: 400px;
 }
 
 .w-full {
@@ -1460,27 +1452,8 @@ html {
   row-gap: 0.5rem;
 }
 
-.border-2 {
-  border-width: 2px;
-}
-
-.border-dashed {
-  border-style: dashed;
-}
-
-.border-info {
-  --tw-border-opacity: 1;
-  border-color: hsl(var(--in) / var(--tw-border-opacity));
-}
-
-.border-success {
-  --tw-border-opacity: 1;
-  border-color: hsl(var(--su) / var(--tw-border-opacity));
-}
-
-.border-warning {
-  --tw-border-opacity: 1;
-  border-color: hsl(var(--wa) / var(--tw-border-opacity));
+.overflow-hidden {
+  overflow: hidden;
 }
 
 .p-2 {

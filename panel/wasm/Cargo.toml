@@ -10,6 +10,7 @@ crate-type = ["cdylib", "rlib"]
 
 
 [dependencies]
+base64 = { workspace = true }
 gloo = { workspace = true }
 yew = { workspace = true, features = ["csr"] }
 js-sys = { workspace = true }

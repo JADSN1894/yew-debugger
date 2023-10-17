@@ -1,5 +1,6 @@
 mod models;
 
+use base64::{engine::general_purpose as b64_general_purpose, Engine as _};
 use gloo::{
     console::{self, log},
     utils::{document, format::JsValueSerdeExt},
@@ -7,7 +8,7 @@ use gloo::{
 use js_sys::Date;
 use models::{CounterModel, ThemeMode};
 use serde::Serialize;
-use serde_json::json; 
+use serde_json::json;
 use serde_json::Value;
 use std::cell::RefCell;
 use std::ops::{AddAssign, SubAssign};
@@ -38,11 +39,21 @@ pub struct App {
 }
 
 impl App {
-    fn send_to_debugger(event: Value) {
-        // let msg_id = MSG_ID.with(|inner| inner.borrow().load(Ordering::SeqCst));
+    fn send_to_debugger(&self, msg: Msg) {
+        let msg_id = MSG_ID.with(|inner| inner.borrow_mut().fetch_add(1, Ordering::SeqCst));
+        let model = b64_general_purpose::STANDARD.encode(format!("{:#?}", self));
+        let event = json! {
+            {
+                "model": model,
+                "metadata": {
+                    "msg_id": msg_id,
+                    "msg": msg,
+                }
+            }
+        };
 
         let api = "yew-debugger-collector";
-        let dbg_msg = json! {
+        let message_to_debbuger = json! {
         {
             "api": api,
             "event": event,
@@ -50,10 +61,9 @@ impl App {
 
         };
         let global_scope: DedicatedWorkerGlobalScope = js_sys::global().unchecked_into();
-        // let
-        // Send the first message from Rust to the main thread
-        // let _ = global_scope.post_message(&JsValue::from_str("Hello from Rust"));
-        let _ = global_scope.post_message(&JsValue::from_serde(&dbg_msg).unwrap_or_default());
+
+        let _ = global_scope
+            .post_message(&JsValue::from_serde(&message_to_debbuger).unwrap_or_default());
 
         // eval("yourJsFunction();");
     }
@@ -138,18 +148,8 @@ impl Component for App {
                 log!(format!("{:?}", html_element));
             }
         };
-        let model = serde_json::to_value(&self).unwrap_or_default();
-        let msg_id = MSG_ID.with(|inner| inner.borrow_mut().fetch_add(1, Ordering::SeqCst));
-        let envelope = json! {
-            {
-                "model": model,
-                "metadata": {
-                    "msg_id": msg_id,
-                    "msg": msg,
-                }
-            }
-        };
-        App::send_to_debugger(envelope.into());
+        #[cfg(debug_assertions)]
+        self.send_to_debugger(msg);
         true
     }
 

@@ -3,6 +3,7 @@ mod macros;
 mod models;
 mod traits;
 
+use base64::{engine::general_purpose as b64_general_purpose, Engine as _};
 use gloo::{
     console::log,
     timers::callback::Interval,
@@ -98,11 +99,11 @@ impl MessageOutcome {
 #[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct Event {
     metadata: EventMetadata,
-    model: Value,
+    model: String,
 }
 
 impl Event {
-    pub fn model(&self) -> &Value {
+    pub fn model(&self) -> &String {
         &self.model
     }
 
@@ -456,7 +457,9 @@ impl Component for App {
                                                         html!(
                                                             <code>
                                                                 {
-                                                                    serde_json::to_string_pretty(cur_event.model()).unwrap_or_default()
+                                                                    b64_general_purpose::STANDARD.decode(cur_event.model()).ok().map(|raw_bytes| String::from_utf8(raw_bytes).unwrap_or_default())
+
+                                                                    // serde_json::to_string_pretty(cur_event.model()).unwrap_or_default()
                                                                 }
                                                             </code>
                                                         )

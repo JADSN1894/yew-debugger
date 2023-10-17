@@ -14,3 +14,13 @@ terminal-3:
 python-server:
     @npm run build
     @python3 -m http.server --directory dist
+
+# Serve with debbuger using python server
+serve-debug:
+    @npm run debug
+    @python3 -m http.server --directory dist
+
+# Serve without debbuger using python server
+serve-release:
+    @npm run build
+    @python3 -m http.server --directory dist

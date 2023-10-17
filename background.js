@@ -67,31 +67,30 @@ function handleMessageFromPanel(sender, message, sendResponse) {
     // console.log("Accepted message")
     const command = message["command"] || null;
     const commandName = command["name"] || null;
-    if (commandName === "GetEvents") {
-      // const outcome = yew_debugger_panel(JSON.stringify(command));
-      // console.log("EndpointFound: GetEvents")
-      const events = JSON.parse(JSON.stringify(EVENTS_COLLECTOR))
-      const outcome = {
-        isOk: true,
-        data: events
-      }
-      // console.log("outcome")
-      // console.log(outcome)
-      sendResponse(outcome);
-    } else {
-      const outcome = {
-        isOk: false,
-        error: null
-      }
-      sendResponse(outcome);
+
+    switch (commandName) {
+      case "GetEvents":
+        const events = JSON.parse(JSON.stringify(EVENTS_COLLECTOR))
+        sendResponse({
+          isOk: true,
+          data: events
+        });
+        break;
+      
+      case "ResetEvents":
+        EVENTS_COLLECTOR = []
+        sendResponse({
+          isOk: true,
+          data: EVENTS_COLLECTOR
+        });
+        break;
+
+      default:
+        sendResponse({
+          isOk: false,
+          error: null
+        });
+        break;
     }
-  } else {
-    const message_to_send = {
-      "message": "Error: Invalid origin for panel.html API"
-    };
-    console.log(message_to_send)
-    sendResponse(message_to_send)
   }
-
-
 }

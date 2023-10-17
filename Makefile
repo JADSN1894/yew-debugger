@@ -58,3 +58,10 @@ dev: build_dev distrib
 release: build_release distrib
 
 clean: clean_build clean_distrib
+
+# Examples yew-app
+debug_examples_yew_app: 
+	$(MAKE) -C examples/yew-debugger-counter-layout serve_debug
+
+release_examples_yew_app: 
+	$(MAKE) -C examples/yew-debugger-counter-layout serve_release

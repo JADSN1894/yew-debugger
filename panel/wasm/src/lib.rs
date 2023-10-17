@@ -30,7 +30,8 @@ pub enum Msg {
     Nil,
     GetEvents,
     ResetEvents,
-    UpdateDebuggerInView(MessageOutcome),
+    ReloadApplication,
+    RenderEvents(MessageOutcome),
     ChangeEventCotentOnClick(Event),
     ToggleThemeMode,
 }
@@ -183,17 +184,17 @@ impl Component for App {
 
                 let closure =
                     Closure::wrap(Box::new(move |message: JsValue, _: JsValue, _: JsValue| {
-                        log!("Closure::GetEvents");
+                        // log!("Closure::GetEvents");
 
                         match serde_wasm_bindgen::from_value::<MessageOutcome>(message) {
                             Ok(envelope) => {
-                                log!("&envelope");
-                                log!(format!("{:?}", &envelope));
-                                ctx_clone.send_message(Msg::UpdateDebuggerInView(envelope));
+                                // log!("&envelope");
+                                // log!(format!("{:?}", &envelope));
+                                ctx_clone.send_message(Msg::RenderEvents(envelope));
                             }
                             Err(error) => {
-                                log!("ERROR");
-                                log!(error.to_string());
+                                // log!("ERROR");
+                                // log!(error.to_string());
                             }
                         };
                     })
@@ -224,18 +225,17 @@ impl Component for App {
                 // TODO: Implement error handler
                 let js_value = JsValue::from_serde(&message).unwrap_or_default();
 
-                let ctx_clone = ctx.link().clone();
+                let cloned_ctx = ctx.link().clone();
 
                 let closure =
                     Closure::wrap(Box::new(move |message: JsValue, _: JsValue, _: JsValue| {
                         log!("Closure::ResetEvents");
 
-                        //? [JADSN] ctx_clone.send_message(Msg::UpdateDebuggerInView(Default::default()));
                         match serde_wasm_bindgen::from_value::<MessageOutcome>(message) {
                             Ok(envelope) => {
                                 log!("&envelope");
                                 log!(format!("{:?}", &envelope));
-                                ctx_clone.send_message(Msg::UpdateDebuggerInView(envelope));
+                                cloned_ctx.send_message(Msg::RenderEvents(envelope));
                             }
                             Err(error) => {
                                 log!("ERROR");
@@ -253,17 +253,54 @@ impl Component for App {
 
                 self.set_current_event(None);
 
+                ctx.link().send_message(Msg::ReloadApplication);
+
                 true
             }
 
             Msg::Nil => false,
 
-            Msg::UpdateDebuggerInView(input_inner) => {
-                self.model = Model {
-                    message_outcome: input_inner,
-                };
-
+            Msg::RenderEvents(message_outcome) => {
+                self.model = Model { message_outcome };
                 true
+            }
+            Msg::ReloadApplication => {
+                let command = json!(
+                    {
+                        "name": "ReloadApplication",
+                        "data": null
+                    }
+                );
+                let message = json!(
+                    {
+                        "command": command,
+                        "api": "yew-debugger-panel",
+                    }
+                );
+                let js_value = JsValue::from_serde(&message).unwrap_or_default();
+
+                let ctx_clone = ctx.link().clone();
+
+                let closure =
+                    Closure::wrap(Box::new(move |message: JsValue, _: JsValue, _: JsValue| {
+                        log!("Closure::ReloadApplication");
+
+                        match serde_wasm_bindgen::from_value::<MessageOutcome>(message) {
+                            Ok(envelope) => {
+                                log!("&envelope");
+                                log!(format!("{:?}", &envelope));
+                                ctx_clone.send_message(Msg::RenderEvents(envelope));
+                            }
+                            Err(error) => {
+                                log!("ERROR");
+                                log!(error.to_string());
+                            }
+                        };
+                    })
+                        as Box<dyn FnMut(JsValue, JsValue, JsValue)>);
+
+                sendMessage(js_value, &closure.as_ref().unchecked_ref());
+                false
             }
             Msg::ChangeEventCotentOnClick(input_inner) => {
                 self.set_current_event(Some(input_inner));
@@ -391,14 +428,14 @@ impl Component for App {
                             // TODO: FIX - [JADSN]: Height base on user height size
                             <div class="flex flex-col flex-grow pl-1 overflow-y-auto h-[600px]">
                                <div class="flex flex-col">
-                                    <pre class="text-primary-content uppercase font-mono font-bold">
+                                    <pre class="text-primary-content uppercase">
                                         <span class="text-base-content">{"-- Message "}</span>
                                         if self.current_event().is_some() {
                                             {
                                                 self
                                                     .current_event()
                                                     .map(|cur_event|
-                                                        html!(<span class="text-base-content">{cur_event.metadata().msg_id()}</span>)
+                                                        html!(<span class="text-base-content font-mono font-bold">{cur_event.metadata().msg_id()}</span>)
                                                     )
                                             }
                                         }
@@ -408,7 +445,7 @@ impl Component for App {
                                     </pre>
                                 </div>
                                 <div class="flex flex-col">
-                                    <pre class="text-base-content uppercase font-mono font-bold"><code>{"-- Model"}</code></pre>
+                                    <pre class="text-base-content uppercase"><code>{"-- Model"}</code></pre>
                                     if self.current_event().is_some() {
                                         <pre class="text-base-content pt-2 font-mono">
                                             {

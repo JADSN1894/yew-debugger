@@ -307,6 +307,7 @@ impl Component for App {
         html!(
             <main class="h-full w-full p-4">
                 <div class="flex flex-col w-full gap-y-2">
+                        //* Top - Reset events button and toggle theme
                         <div class="flex w-full justify-between items-center">
                             <button class="text-accent-content font-mono px-4 btn btn-sm btn-accent" onclick={ctx.link().callback(|_| Msg::ResetEvents)}>
                                 { "[ Reset Events ]" }
@@ -318,6 +319,7 @@ impl Component for App {
                     // if is_ok.clone() == false && data.is_none() && error.is_none() {
                     //     <pre class="pt-6 text-primary-content font-mono"><code>{model_view}</code></pre>
                     // } else {
+                        //* Bottom - Event list and current message content
                         <div class="flex pt-6">
                             //* Left side: Event list
                             <div class="w-[50%]">
@@ -344,14 +346,14 @@ impl Component for App {
                                                                     };
 
                                                                     html!(
-                                                                        <button class={classes!(["flex items-center justify-between btn", message_selected_color])} onclick={ctx.link().callback(cb_change_event_content_on_click)}>
+                                                                        <button class={classes!(["flex items-center justify-between btn !normal-case", message_selected_color])} onclick={ctx.link().callback(cb_change_event_content_on_click)}>
                                                                             <span class="font-mono font-bold">{msg}</span>
                                                                             <span class="font-mono font-bold">{msg_id}</span>
                                                                         </button>
                                                                     )
                                                                 } else {
                                                                     html!(
-                                                                        <button class="flex items-center justify-between btn btn-primary" onclick={ctx.link().callback(cb_change_event_content_on_click)}>
+                                                                        <button class="flex items-center justify-between btn btn-primary !normal-case" onclick={ctx.link().callback(cb_change_event_content_on_click)}>
                                                                             <span class="font-mono font-bold">{msg}</span>
                                                                             <span class="font-mono font-bold">{msg_id}</span>
                                                                         </button>

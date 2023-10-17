@@ -1574,6 +1574,10 @@ html {
   text-transform: uppercase;
 }
 
+.\!normal-case {
+  text-transform: none !important;
+}
+
 .text-accent-content {
   --tw-text-opacity: 1;
   color: hsl(var(--ac) / var(--tw-text-opacity));

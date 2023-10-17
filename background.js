@@ -12,7 +12,6 @@ async function runDemo() {
 
   print();
   print_with_value('');
-
 }
 
 chrome.runtime.onMessage.addListener(
@@ -52,7 +51,7 @@ function handleMessageFromContentScript(sender, message, sendResponse) {
   sendResponse(outcome);
 }
 
-function handleMessageFromPanel(sender, message, sendResponse) {
+async function handleMessageFromPanel(sender, message, sendResponse) {
   // console.log("handleMessageFromPanel");
   // console.log(message)
   const senderId = sender["id"] || null;
@@ -76,13 +75,14 @@ function handleMessageFromPanel(sender, message, sendResponse) {
           data: events
         });
         break;
-      
+
       case "ResetEvents":
         EVENTS_COLLECTOR = []
         sendResponse({
           isOk: true,
           data: EVENTS_COLLECTOR
         });
+
         break;
 
       default:

@@ -1,7 +1,5 @@
-mod components;
 mod models;
 
-use crate::components::CounterComponent;
 use gloo::{
     console::{self, log},
     utils::{document, format::JsValueSerdeExt},
@@ -9,7 +7,7 @@ use gloo::{
 use js_sys::Date;
 use models::{CounterModel, ThemeMode};
 use serde::Serialize;
-use serde_json::json;
+use serde_json::json; 
 use serde_json::Value;
 use std::cell::RefCell;
 use std::ops::{AddAssign, SubAssign};
@@ -106,7 +104,7 @@ impl Component for App {
         Self::default()
     }
 
-    fn update(&mut self, ctx: &Context<Self>, msg: Self::Message) -> bool {
+    fn update(&mut self, _ctx: &Context<Self>, msg: Self::Message) -> bool {
         match msg {
             Msg::Increment => {
                 self.counter.add_assign(1.into());
@@ -157,25 +155,25 @@ impl Component for App {
 
     fn view(&self, ctx: &Context<Self>) -> Html {
         html! {
-            <div class="h-screen w-screen flex items-center justify-center border-info border-dashed border-2">
-                <div class="w-[400px] h-[750px] flex flex-col items-center justify-center border-success border-dashed border-2">
+            <div class="h-screen w-screen flex items-center justify-center overflow-hidden">
+                <div class="flex flex-col items-center justify-center">
 
                         // Header
-                        <div class="flex items-center justify-end mr-2 border-success border-dashed border-2">
+                        <div class="flex items-center justify-end mr-2">
                             <input type="checkbox" class="toggle toggle-primary" onchange={ctx.link().callback(|_| Msg::ToggleThemeMode)} checked={self.current_theme_mode.clone().into()} />
                         </div>
 
                         // Content
-                        <div class="flex flex-col flex-grow items-center justify-center gap-y-2 border-warning border-dashed border-2 w-full p-2">
+                        <div class="flex flex-col flex-grow items-center justify-center gap-y-2 w-full p-2">
 
                             // Display the current value of the counter
                             <div>
-                                <p class="text-3xl font-bold border-warning border-dashed border-2 w-full p-2">
+                                <p class="text-3xl font-bold w-full p-2">
                                     { self.counter().clone().take() }
                                 </p>
                             </div>
 
-                            <div class="flex items-center justify-center gap-x-2 border-warning border-dashed border-2 w-full p-2">
+                            <div class="flex items-center justify-center gap-x-2 w-full p-2">
                                 // A button to send the Increment message
                                 <button class="btn btn-primary" onclick={ctx.link().callback(|_| Msg::Increment)}>
                                     { "+1" }
@@ -193,14 +191,12 @@ impl Component for App {
                             </div>
                         </div>
 
-                        // <CounterComponent counter={self.counter().clone()} />
-
                         // Footer
-                        <div class="flex items-center justify-center border-success border-dashed border-2">
+                        <div class="flex flex-col items-center justify-center">
+                            <p>{ "Rendered" }</p>
                             <p class="text-xs">
-                                    { "Rendered: " }
-                                    { String::from(Date::new_0().to_string()) }
-                                </p>
+                                { String::from(Date::new_0().to_string()) }
+                            </p>
                         </div>
                 </div>
         </div>

@@ -26,12 +26,18 @@ pre_build:
 dev: clean pre_build
 	@npm run dev
 
+serve_debug_build: clean pre_build
+	@npm run debug 
+
 serve_debug: clean pre_build
-	@npm run debug && \
+	@make serve_debug_build && \
     python3 -m http.server --directory $(DIST_DIR)
 
-serve_release: clean pre_build
-	@npm run build && \
+serve_release_build: clean pre_build
+	@npm run build 
+
+serve_release:
+	@make serve_release_build && \
     python3 -m http.server --directory $(DIST_DIR)
 
 clean:

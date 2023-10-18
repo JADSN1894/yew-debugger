@@ -1,6 +1,6 @@
 **/**/target
 **/**/node_modules
-/crx
 /panel/dist
 /background/pkg
-/artifacts
+/crx
+/dist-example

@@ -12,7 +12,7 @@ use gloo::{
 use js_sys::Function;
 use models::ThemeMode;
 use serde::{Deserialize, Serialize};
-use serde_json::{json, Value};
+use serde_json::json;
 use wasm_bindgen::{
     prelude::{wasm_bindgen, Closure},
     JsCast, JsValue, UnwrapThrowExt,
@@ -193,7 +193,7 @@ impl Component for App {
                                 // log!(format!("{:?}", &envelope));
                                 ctx_clone.send_message(Msg::RenderEvents(envelope));
                             }
-                            Err(error) => {
+                            Err(_error) => {
                                 // log!("ERROR");
                                 // log!(error.to_string());
                             }
@@ -250,11 +250,11 @@ impl Component for App {
                 // log!(&js_value);
                 sendMessage(js_value, &closure.as_ref().unchecked_ref());
 
-                closure.forget();
-
                 self.set_current_event(None);
 
                 ctx.link().send_message(Msg::ReloadApplication);
+
+                closure.forget();
 
                 true
             }
@@ -301,6 +301,9 @@ impl Component for App {
                         as Box<dyn FnMut(JsValue, JsValue, JsValue)>);
 
                 sendMessage(js_value, &closure.as_ref().unchecked_ref());
+
+                closure.forget();
+
                 false
             }
             Msg::ChangeEventCotentOnClick(input_inner) => {

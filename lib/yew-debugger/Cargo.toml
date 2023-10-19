@@ -2,15 +2,10 @@
 name = "yew-debugger"
 version = "0.0.1"
 edition = "2021"
+license = "MIT"
+description = "Yew debugger collector"
 
 [dependencies]
-# base64 = { workspace = true }
-# serde_json = { workspace = true }
-# js-sys = { workspace = true }
-# web-sys = { workspace = true }
-# wasm-bindgen = { workspace = true }
-# gloo = { workspace = true }
-
 base64 = { version = "0.21.4" }
 gloo = { version = "0.10.0" }
 js-sys = { version = "0.3.64" }

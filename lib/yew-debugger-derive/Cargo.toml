@@ -2,7 +2,8 @@
 name = "yew-debugger-derive"
 version = "0.0.1"
 edition = "2021"
-
+license = "MIT"
+description = "Yew debugger collector(derives)"
 
 [lib]
 proc-macro = true

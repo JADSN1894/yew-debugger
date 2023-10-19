@@ -1,3 +1,6 @@
+#[macro_use]
+pub mod macros;
+
 use base64::{engine::general_purpose as b64_general_purpose, Engine as _};
 use gloo::utils::format::JsValueSerdeExt;
 use serde_json::json;
@@ -9,27 +12,17 @@ use std::{
 use wasm_bindgen::{JsCast, JsValue};
 use web_sys::DedicatedWorkerGlobalScope;
 
-// YewMessage -> ComponentMessage
-// YewModel -> ComponentModel
-// YewDebug -> ComponentDebug
+pub trait YewComponentMessage: Debug {}
 
-pub trait YewMessage: Debug {}
+pub trait YewComponentModel: Debug {}
 
-pub trait YewModel: Debug {}
-
-// pub trait YewDebugger<Model, Message> {
-//     fn send_to_debbuger(&self,message: impl YewMessage)
-//     where
-//         Self: YewModel;
-// }
-
-pub trait YewDebug<Model, Message> {
+pub trait YewComponentDebug<Model: YewComponentModel, Message: YewComponentMessage> {
     thread_local! {
         static MSG_ID: RefCell<AtomicUsize> = const {
             RefCell::new(AtomicUsize::new(0))};
 
     }
-    fn send_to_debbuger(model: &impl YewModel, msg: &impl YewMessage) {
+    fn send_to_debbuger(model: &Model, msg: &Message) {
         let msg_id = Self::MSG_ID.with(|inner| inner.borrow_mut().fetch_add(1, Ordering::SeqCst));
         let encoded_model = b64_general_purpose::STANDARD.encode(format!("{:#?}", model));
         let event = json! {
@@ -56,18 +49,3 @@ pub trait YewDebug<Model, Message> {
             .post_message(&JsValue::from_serde(&message_to_debbuger).unwrap_or_default());
     }
 }
-
-// pub fn add(left: usize, right: usize) -> usize {
-//     left + right
-// }
-
-// #[cfg(test)]
-// mod tests {
-//     use super::*;
-
-//     #[test]
-//     fn it_works() {
-//         let result = add(2, 2);
-//         assert_eq!(result, 4);
-//     }
-// }

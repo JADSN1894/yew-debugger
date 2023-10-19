@@ -11,29 +11,17 @@ use std::ops::{AddAssign, SubAssign};
 use wasm_bindgen::{prelude::wasm_bindgen, JsCast, JsValue, UnwrapThrowExt};
 use web_sys::HtmlElement;
 use yew::{html, Component, Context, Html};
-use yew_debugger::{YewDebug, YewMessage, YewModel};
+use yew_debugger::impl_yew_debugger;
+use yew_debugger_derive::{YewMessage, YewModel};
 
-// use base64::{engine::general_purpose as b64_general_purpose, Engine as _};
-// use serde_json::json;
-// use std::cell::RefCell;
-// use std::sync::atomic::AtomicUsize;
-// use std::sync::atomic::Ordering;
-// use web_sys::DedicatedWorkerGlobalScope;
-
-// thread_local! {
-//     static MSG_ID: RefCell<AtomicUsize> = const {
-//         RefCell::new(AtomicUsize::new(0))};
-
-// }
-
-#[derive(Debug, Serialize)]
+#[derive(Debug, Serialize, YewMessage)]
 pub enum Msg {
     Increment,
     Decrement,
     ToggleThemeMode,
 }
 
-#[derive(Debug, Serialize)]
+#[derive(Debug, Serialize, YewModel)]
 pub struct App {
     counter: CounterModel,
     current_theme_mode: ThemeMode,
@@ -79,10 +67,8 @@ impl Default for App {
     }
 }
 
-impl YewMessage for Msg {}
-impl YewModel for App {}
-
-impl YewDebug<Msg, App> for App {}
+// * Yew Debugger Setup: 1 of 2
+impl_yew_debugger!(App, Msg);
 
 impl Component for App {
     type Message = Msg;
@@ -93,6 +79,7 @@ impl Component for App {
     }
 
     fn update(&mut self, _ctx: &Context<Self>, msg: Self::Message) -> bool {
+        // * Yew Debugger Setup: 2 of 2
         #[cfg(debug_assertions)]
         App::send_to_debbuger(self, &msg);
 

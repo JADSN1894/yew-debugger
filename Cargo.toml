@@ -1,17 +1,14 @@
 [workspace]
 resolver = "2"
 
-members = [
-    "background",
+members = ["background", "panel/wasm"]
+
+exclude = [
     "examples/yew-debugger-counter-layout/yew-app",
-    "panel/wasm",
     "lib/yew-debugger",
     "lib/yew-debugger-derive",
 ]
 
-[patch.crates-io]
-yew-debugger = { path = "lib/yew-debugger" }
-yew-debugger-derive = { path = "lib/yew-debugger-derive" }
 
 [workspace.dependencies]
 base64 = { version = "0.21.4" }

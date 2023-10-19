@@ -2,10 +2,17 @@
 resolver = "2"
 
 members = [
-    "./background",
-    "./examples/yew-debugger-counter-layout/yew-app",
-    "./panel/wasm",
+    "background",
+    "examples/yew-debugger-counter-layout/yew-app",
+    "panel/wasm",
+    "lib/yew-debugger",
+    "lib/yew-debugger-derive",
 ]
+
+[patch.crates-io]
+yew-debugger = { path = "lib/yew-debugger" }
+yew-debugger-derive = { path = "lib/yew-debugger-derive" }
+
 [workspace.dependencies]
 base64 = { version = "0.21.4" }
 gloo = { version = "0.10.0" }
@@ -16,3 +23,4 @@ serde_json = { version = "1.0.107" }
 serde-wasm-bindgen = "0.6.0"
 wasm-bindgen = { version = "0.2.87" }
 web-sys = { version = "0.3.64" }
+yew-debugger = { version = "*" }

@@ -1,0 +1,18 @@
+[package]
+name = "yew-debugger"
+version = "0.0.1"
+edition = "2021"
+
+[dependencies]
+base64 = { workspace = true }
+serde_json = { workspace = true }
+js-sys = { workspace = true }
+web-sys = { workspace = true }
+wasm-bindgen = { workspace = true }
+yew-debugger-derive = { version = "*", optional = true }
+gloo = { workspace = true }
+[features]
+
+default = []
+
+derive = ["dep:yew-debugger-derive"]

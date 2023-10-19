@@ -1166,14 +1166,34 @@ dependencies = [
 name = "yew-app"
 version = "0.0.1"
 dependencies = [
- "base64",
  "gloo 0.10.0",
  "js-sys",
  "serde",
- "serde_json",
  "wasm-bindgen",
  "web-sys",
  "yew",
+ "yew-debugger",
+]
+
+[[package]]
+name = "yew-debugger"
+version = "0.0.1"
+dependencies = [
+ "base64",
+ "gloo 0.10.0",
+ "js-sys",
+ "serde_json",
+ "wasm-bindgen",
+ "web-sys",
+ "yew-debugger-derive",
+]
+
+[[package]]
+name = "yew-debugger-derive"
+version = "0.0.1"
+dependencies = [
+ "quote",
+ "syn 2.0.38",
 ]
 
 [[package]]

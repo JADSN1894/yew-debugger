@@ -1,29 +1,30 @@
 mod models;
 
-use base64::{engine::general_purpose as b64_general_purpose, Engine as _};
 use gloo::{
     console::{self, log},
-    utils::{document, format::JsValueSerdeExt},
+    utils::document,
 };
 use js_sys::Date;
 use models::{CounterModel, ThemeMode};
 use serde::Serialize;
-use serde_json::json;
-use serde_json::Value;
-use std::cell::RefCell;
 use std::ops::{AddAssign, SubAssign};
-use std::sync::atomic::AtomicUsize;
-use std::sync::atomic::Ordering;
 use wasm_bindgen::{prelude::wasm_bindgen, JsCast, JsValue, UnwrapThrowExt};
-use web_sys::DedicatedWorkerGlobalScope;
 use web_sys::HtmlElement;
 use yew::{html, Component, Context, Html};
+use yew_debugger::{YewDebug, YewMessage, YewModel};
 
-thread_local! {
-    static MSG_ID: RefCell<AtomicUsize> = const {
-        RefCell::new(AtomicUsize::new(0))};
+// use base64::{engine::general_purpose as b64_general_purpose, Engine as _};
+// use serde_json::json;
+// use std::cell::RefCell;
+// use std::sync::atomic::AtomicUsize;
+// use std::sync::atomic::Ordering;
+// use web_sys::DedicatedWorkerGlobalScope;
 
-}
+// thread_local! {
+//     static MSG_ID: RefCell<AtomicUsize> = const {
+//         RefCell::new(AtomicUsize::new(0))};
+
+// }
 
 #[derive(Debug, Serialize)]
 pub enum Msg {
@@ -39,34 +40,6 @@ pub struct App {
 }
 
 impl App {
-    fn send_to_debugger(&self, msg: Msg) {
-        let msg_id = MSG_ID.with(|inner| inner.borrow_mut().fetch_add(1, Ordering::SeqCst));
-        let model = b64_general_purpose::STANDARD.encode(format!("{:#?}", self));
-        let event = json! {
-            {
-                "model": model,
-                "metadata": {
-                    "msg_id": msg_id,
-                    "msg": msg,
-                }
-            }
-        };
-
-        let api = "yew-debugger-collector";
-        let message_to_debbuger = json! {
-        {
-            "api": api,
-            "event": event,
-        }
-
-        };
-        let global_scope: DedicatedWorkerGlobalScope = js_sys::global().unchecked_into();
-
-        let _ = global_scope
-            .post_message(&JsValue::from_serde(&message_to_debbuger).unwrap_or_default());
-
-        // eval("yourJsFunction();");
-    }
     pub fn counter(&self) -> &CounterModel {
         &self.counter
     }
@@ -106,6 +79,11 @@ impl Default for App {
     }
 }
 
+impl YewMessage for Msg {}
+impl YewModel for App {}
+
+impl YewDebug<Msg, App> for App {}
+
 impl Component for App {
     type Message = Msg;
     type Properties = ();
@@ -115,6 +93,9 @@ impl Component for App {
     }
 
     fn update(&mut self, _ctx: &Context<Self>, msg: Self::Message) -> bool {
+        #[cfg(debug_assertions)]
+        App::send_to_debbuger(self, &msg);
+
         match msg {
             Msg::Increment => {
                 self.counter.add_assign(1.into());
@@ -148,8 +129,6 @@ impl Component for App {
                 log!(format!("{:?}", html_element));
             }
         };
-        #[cfg(debug_assertions)]
-        self.send_to_debugger(msg);
         true
     }
 

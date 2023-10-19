@@ -11,12 +11,16 @@ license = "MIT"
 [lib]
 crate-type = ["cdylib", "rlib"]
 
+# [patch.crates-io]
+# yew-debugger = { path = "../../../lib/yew-debugger" }
+# yew-debugger-derive = { path = "../../../lib/yew-debugger-derive" }
+
 [dependencies]
-base64 = { version = "0.21.4" }
 gloo = { version = "=0.10.0" }
 js-sys = { version = "=0.3.64" }
 serde = { version = "1.0.188", features = ["derive"] }
-serde_json = { version = "1.0.107" }
 wasm-bindgen = { version = "=0.2.87" }
 web-sys = { version = "=0.3.64" }
 yew = { version = "=0.21.0", features = ["csr"] }
+yew-debugger = { version = "*" }
+yew-debugger-derive = { version = "*" }

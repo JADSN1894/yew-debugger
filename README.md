@@ -1,7 +1,9 @@
 I'm excited to introduce `yew-debugger` – a powerful DevTools extension meticulously designed to enhance your debugging experience with Yew framework applications. Dive deep into your code, diagnose issues, and streamline your development process with ease.
 
-## Screenshot
+## Status
+![Makefile CI](https://github.com/JADSN1894/yew-debugger/actions/workflows/makefile.yml/badge.svg)
 
+## Screenshot
 ![Screenshot](docs/yew-debugger-running-with-example.png?raw=true)
 
 

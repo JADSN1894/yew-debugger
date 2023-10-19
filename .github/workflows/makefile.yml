@@ -1,0 +1,185 @@
+name: Makefile CI
+
+on:
+  push:
+    branches: [ "dev" ]
+  pull_request:
+    branches: [ "dev" ]
+jobs:
+
+  wasm-pack:
+    runs-on: ubuntu-latest
+    env:
+      WASM_PACK_REPO: rustwasm/wasm-pack
+      WASM_PACK_CURRENT_VERSION: v0.12.1
+    steps:
+      - uses: actions/checkout@v3
+      - name: Cache cargo registry
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+          key: ${{ runner.os }}-${{ matrix.backend }}-cargo-${{ hashFiles('**/Cargo.toml') }}
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 18
+      - run: mkdir -p ~/bin-wasm-pack/
+      - run: curl -sSfL https://github.com/$WASM_PACK_REPO/releases/download/$WASM_PACK_CURRENT_VERSION/wasm-pack-$WASM_PACK_CURRENT_VERSION-x86_64-unknown-linux-musl.tar.gz |  zcat - | tar xvf - "wasm-pack-$WASM_PACK_CURRENT_VERSION-x86_64-unknown-linux-musl/"
+      - run: mv wasm-pack-$WASM_PACK_CURRENT_VERSION-x86_64-unknown-linux-musl/wasm-pack ~/bin-wasm-pack/
+      - run: rm -rf ./wasm-pack-$WASM_PACK_CURRENT_VERSION-x86_64-unknown-linux-musl/
+      - uses: actions/upload-artifact@v3
+        with:
+          name: wasm-pack
+          path: ~/bin-wasm-pack/
+          retention-days: 1
+
+  rustfmt:
+    if: false
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3   
+      - name: Cache cargo registry
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+          key: ${{ runner.os }}-${{ matrix.backend }}-cargo-${{ hashFiles('**/Cargo.toml') }}
+      - name: Cargo fmt check
+        run: cargo fmt --check
+      - name: Cargo clippy
+        run: cargo clippy
+      - name: Cargo check
+        run: cargo check --release
+
+  example:
+    needs: wasm-pack
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Cache cargo registry
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+          key: ${{ runner.os }}-${{ matrix.backend }}-cargo-${{ hashFiles('**/Cargo.toml') }}
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 18
+      - uses: actions/download-artifact@v3
+        with:
+          name: wasm-pack
+          path: ~/bin-wasm-pack/
+      - run: cp -v ~/bin-wasm-pack/wasm-pack /usr/local/bin/
+      - run: chmod +x /usr/local/bin/wasm-pack
+      - run: make build_example_debug
+      - run: mkdir -p ~/temp-artifacts
+      - run: cp -rv ./examples/yew-debugger-counter-layout/dist ~/temp-artifacts/dist-example
+      - uses: actions/upload-artifact@v3
+        with:
+          name: yew-app-example.zip
+          path:  ~/temp-artifacts/dist-example
+          retention-days: 14
+ 
+  background:
+    needs: wasm-pack
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Cache cargo registry
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+          key: ${{ runner.os }}-${{ matrix.backend }}-cargo-${{ hashFiles('**/Cargo.toml') }}
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 18
+      - uses: actions/download-artifact@v3
+        with:
+          name: wasm-pack
+          path: ~/bin-wasm-pack/
+      - run: cp -v ~/bin-wasm-pack/wasm-pack /usr/local/bin/
+      - run: chmod +x /usr/local/bin/wasm-pack
+      - run: make -C background release
+      - run: mkdir -p ~/temp-artifacts
+      - run: cp -rv ./background/pkg/ ~/temp-artifacts/dist-background
+      - uses: actions/upload-artifact@v3
+        with:
+          name: background.tmp
+          path:  ~/temp-artifacts/dist-background
+          retention-days: 1
+
+  panel:
+    needs: wasm-pack
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Cache cargo registry
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+          key: ${{ runner.os }}-${{ matrix.backend }}-cargo-${{ hashFiles('**/Cargo.toml') }}
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 18
+      - uses: actions/download-artifact@v3
+        with:
+          name: wasm-pack
+          path: ~/bin-wasm-pack/
+      - run: cp -v ~/bin-wasm-pack/wasm-pack /usr/local/bin/
+      - run: chmod +x /usr/local/bin/wasm-pack
+      - run: make -C panel release
+      - run: mkdir -p ~/temp-artifacts
+      - run: cp -rv ./panel/dist ~/temp-artifacts/dist-panel
+      - uses: actions/upload-artifact@v3
+        with:
+          name: panel.tmp
+          path:  ~/temp-artifacts/dist-panel
+          retention-days: 1
+ 
+  crx:
+    needs: [panel, background]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Cache cargo registry
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+          key: ${{ runner.os }}-${{ matrix.backend }}-cargo-${{ hashFiles('**/Cargo.toml') }}
+      - run: mkdir -vp ~/crx 
+      - run: cp -v manifest.json ~/crx/
+      - run: cp -v devtools.html ~/crx/
+      - run: cp -v devtools.js ~/crx/
+      - run: cp -v background.js ~/crx/
+      - run: cp -v content-script.js ~/crx/
+      - uses: actions/download-artifact@v3
+        with:
+          name: panel.tmp
+          path: ~/dist-panel
+      - uses: actions/download-artifact@v3
+        with:
+          name: background.tmp
+          path: ~/dist-background
+      - run: cp -rv ~/dist-panel/assets ~/crx/
+      - run: cp -rv ~/dist-panel/index.html ~/crx/panel.html
+      - run: cp -rv ~/dist-background ~/crx/background
+      - uses: geekyeggo/delete-artifact@v2
+        with:
+          name: |
+            wasm-pack
+            background.tmp
+            panel.tmp
+      - uses: actions/upload-artifact@v3
+        with:
+          name: yew-debugger.crx
+          path: ~/crx/
+          retention-days: 14

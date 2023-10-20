@@ -368,7 +368,7 @@ impl Component for App {
                                 <div class="w-[50%]">
                                     {
                                         if is_ok == true && maybe_data.is_some() {
-                                            // Safe: At this point the maybe_data surely is some
+                                            // Safe: At this point the `maybe_data` surely is some
                                             let events = maybe_data.unwrap_or_default();
                                                 if events.is_empty() {
                                                     html!(<h1 class="!text-4xl text-base-content font-bold font-mono uppercase">{"No events"}</h1>)
@@ -414,7 +414,7 @@ impl Component for App {
                                             } else {
                                                 html!(
                                                     <div>
-                                                        <h1 class="text-error-content font-bold font-mono uppercase">{"[2] Impossible state"}</h1>
+                                                        <h1 class="text-error-content font-bold font-mono uppercase">{"[1] Impossible state"}</h1>
 
                                                     </div>
                                                 )

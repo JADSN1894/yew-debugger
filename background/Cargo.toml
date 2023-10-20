@@ -11,9 +11,5 @@ gloo = { workspace = true }
 yew = { workspace = true }
 js-sys = { workspace = true }
 serde_json = { workspace = true }
-serde-wasm-bindgen = { workspace = true }
 serde = { workspace = true, features = ["derive"] }
-# web-sys = { workspace = true, features = ['console'] }
-web-sys = { workspace = true }
-# wasm-bindgen = { workspace = true, features = ["serde-serialize"] }
 wasm-bindgen = { workspace = true }

@@ -3,12 +3,13 @@
   "private": true,
   "version": "0.0.0",
   "scripts": {
-    "tailwind": "./tailwindcss -i ./input.css -o ./output.css",
+    "tailwind-debug": "./tailwindcss --input ./input.css --output ./output.css",
+    "tailwind-release": "./tailwindcss --input ./input.css --output ./output.css --minify",
     "wasm-debug": "wasm-pack build --target web --no-typescript --mode force --dev --out-name index --out-dir ../wasm ./yew-app",
     "wasm-release": "wasm-pack build --target web --no-typescript --mode force --release --out-name index --out-dir ../wasm ./yew-app",
     "dev": "vite",
-    "debug": "npm run tailwind && npm run wasm-debug && vite build",
-    "build": "npm run tailwind && npm run wasm-release && vite build",
+    "debug": "npm run tailwind-debug && npm run wasm-debug && vite build",
+    "build": "npm run tailwind-release && npm run wasm-release && vite build",
     "preview": "npm run build && vite preview"
   },
   "devDependencies": {

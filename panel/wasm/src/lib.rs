@@ -329,8 +329,6 @@ impl Component for App {
                     .set_attribute("data-theme", self.current_theme_mode.clone().into())
                     .unwrap_throw();
 
-                // log!(format!("{:?}", html_element));
-
                 true
             }
         };
@@ -345,6 +343,8 @@ impl Component for App {
             maybe_error,
         } = model.message_outcome().clone();
 
+        // log!("{:?}", format!(&model.message_outcome().clone()));
+
         html!(
             <main class="h-full w-full p-4">
                 <div class="flex flex-col w-full gap-y-2">
@@ -357,124 +357,116 @@ impl Component for App {
                                 <input type="checkbox" class="toggle toggle-primary" onchange={ctx.link().callback(|_| Msg::ToggleThemeMode)} checked={self.current_theme_mode.clone().into()} />
                             </div>
                         </div>
-                    // if is_ok.clone() == false && data.is_none() && error.is_none() {
-                    //     <pre class="pt-6 text-primary-content font-mono"><code>{model_view}</code></pre>
-                    // } else {
-                        //* Bottom - Event list and current message content
-                        <div class="flex pt-6">
-                            //* Left side: Event list
-                            <div class="w-[50%]">
-                                <>
-                                {
-                                    if is_ok && maybe_data.is_some() {
-                                        if let Some(events) = maybe_data {
-                                            if events.is_empty() {
-                                                html!(<h1 class="!text-4xl text-base-content font-bold font-mono uppercase">{"No events"}</h1>)
+
+                        // Avoid render the `[1] Impossible state` in first render
+                        if is_ok == false && maybe_data.is_none() && maybe_error.is_none() {
+                            <></>
+                        } else {
+                            //* Bottom - Event list and current message content
+                            <div class="flex pt-6">
+                                //* Left side: Event list
+                                <div class="w-[50%]">
+                                    {
+                                        if is_ok == true && maybe_data.is_some() {
+                                            // Safe: At this point the `maybe_data` surely is some
+                                            let events = maybe_data.unwrap_or_default();
+                                                if events.is_empty() {
+                                                    html!(<h1 class="!text-4xl text-base-content font-bold font-mono uppercase">{"No events"}</h1>)
+                                                } else {
+                                                    html!(
+                                                        <div class="h-screen">
+                                                            <div class="pr-1 flex flex-col w-full gap-y-2 h-4/5 overflow-y-auto">
+                                                            {
+                                                                events.into_iter().rev().map(|event_item| {
+                                                                    let cur_event_item = event_item.clone();
+                                                                    let cb_change_event_content_on_click = move |_| Msg::ChangeEventCotentOnClick(cur_event_item.clone());
+                                                                    let msg = event_item.metadata().msg();
+                                                                    let msg_id = event_item.metadata().msg_id();
+                                                                    if let Some(current_event) = self.current_event() {
+                                                                        let message_selected_color = match current_event.metadata().msg_id() == msg_id {
+                                                                            true => "btn-warning",
+                                                                            false => "btn-primary",
+                                                                        };
+
+                                                                        html!(
+                                                                            <button class={classes!(["flex items-center justify-between btn !normal-case", message_selected_color])} onclick={ctx.link().callback(cb_change_event_content_on_click)}>
+                                                                                <span class="font-mono font-bold">{msg}</span>
+                                                                                <span class="font-mono font-bold">{msg_id}</span>
+                                                                            </button>
+                                                                        )
+                                                                    } else {
+                                                                        html!(
+                                                                            <button class="flex items-center justify-between btn btn-primary !normal-case" onclick={ctx.link().callback(cb_change_event_content_on_click)}>
+                                                                                <span class="font-mono font-bold">{msg}</span>
+                                                                                <span class="font-mono font-bold">{msg_id}</span>
+                                                                            </button>
+                                                                        )
+                                                                    }
+                                                                }).collect::<Html>()
+                                                            }
+                                                            </div>
+                                                        </div>
+                                                    )
+                                                }
+                                        } else {
+                                            if let Some(message_outcome_error) = maybe_error {
+                                                html!(<h1 class="text-error-content font-bold font-mono uppercase">{message_outcome_error}</h1>)
                                             } else {
                                                 html!(
-                                                    <div class="h-screen">
-                                                        <div class="pr-1 flex flex-col w-full gap-y-2 h-4/5 overflow-y-auto">
-                                                        {
-                                                            events.into_iter().rev().map(|event_item| {
-                                                                let cur_event_item = event_item.clone();
-                                                                let cb_change_event_content_on_click = move |_| Msg::ChangeEventCotentOnClick(cur_event_item.clone());
-                                                                let msg = event_item.metadata().msg();
-                                                                let msg_id = event_item.metadata().msg_id();
-                                                                if let Some(current_event) = self.current_event() {
-                                                                    let message_selected_color = match current_event.metadata().msg_id() == msg_id {
-                                                                        true => "btn-warning",
-                                                                        false => "btn-primary",
-                                                                    };
+                                                    <div>
+                                                        <h1 class="text-error-content font-bold font-mono uppercase">{"[1] Impossible state"}</h1>
 
-                                                                    html!(
-                                                                        <button class={classes!(["flex items-center justify-between btn !normal-case", message_selected_color])} onclick={ctx.link().callback(cb_change_event_content_on_click)}>
-                                                                            <span class="font-mono font-bold">{msg}</span>
-                                                                            <span class="font-mono font-bold">{msg_id}</span>
-                                                                        </button>
-                                                                    )
-                                                                } else {
-                                                                    html!(
-                                                                        <button class="flex items-center justify-between btn btn-primary !normal-case" onclick={ctx.link().callback(cb_change_event_content_on_click)}>
-                                                                            <span class="font-mono font-bold">{msg}</span>
-                                                                            <span class="font-mono font-bold">{msg_id}</span>
-                                                                        </button>
-                                                                    )
-                                                                }
-                                                            }).collect::<Html>()
-                                                        }
-                                                        </div>
                                                     </div>
                                                 )
                                             }
-                                        } else {
-                                            html!(
-                                                <div>
-                                                    <h1 class="text-error-content font-bold font-mono uppercase">{"Impossible state"}</h1>
-                                                </div>
-                                            )
-                                        }
-                                    } else {
-                                        if let Some(message_outcome_error) = maybe_error {
-                                            html!(<h1 class="text-error-content font-bold font-mono uppercase">{message_outcome_error}</h1>)
-                                        } else {
-                                            html!(
-                                                <div>
-                                                    <h1 class="text-error-content font-bold font-mono uppercase">{"Impossible state"}</h1>
-
-                                                </div>
-                                            )
                                         }
                                     }
-                                }
-                                </>
-                            </div>
-                            //* Right side: Current message content
-                            // TODO: FIX - [JADSN]: Height base on user height size
-                            <div class="flex flex-col flex-grow pl-1 overflow-y-auto h-[600px]">
-                               <div class="flex flex-col">
-                                    <pre class="text-primary-content uppercase">
-                                        <span class="text-base-content">{"-- Message "}</span>
-                                        if self.current_event().is_some() {
-                                            {
-                                                self
-                                                    .current_event()
-                                                    .map(|cur_event|
-                                                        html!(<span class="text-base-content font-mono font-bold">{cur_event.metadata().msg_id()}</span>)
-                                                    )
-                                            }
-                                        }
-                                    </pre>
-                                    <pre class="text-base-content py-2 font-mono">
-                                        {self.current_event().map(|cur_event| html!(<code>{cur_event.metadata().msg()}</code>))}
-                                    </pre>
                                 </div>
+                                //* Right side: Current message content
+                                // TODO: FIX - [JADSN]: Height base on user height size
+                                <div class="flex flex-col flex-grow pl-1 overflow-y-auto h-[600px]">
                                 <div class="flex flex-col">
-                                    <pre class="text-base-content uppercase"><code>{"-- Model"}</code></pre>
-                                    if self.current_event().is_some() {
-                                        <pre class="text-base-content pt-2 font-mono">
-                                            {
-                                                self
-                                                    .current_event()
-                                                    .map(|cur_event|
-
-                                                        html!(
-                                                            <code>
-                                                                {
-                                                                    b64_general_purpose::STANDARD.decode(cur_event.model()).ok().map(|raw_bytes| String::from_utf8(raw_bytes).unwrap_or_default())
-
-                                                                    // serde_json::to_string_pretty(cur_event.model()).unwrap_or_default()
-                                                                }
-                                                            </code>
+                                        <pre class="text-primary-content uppercase">
+                                            <span class="text-base-content">{"-- Message "}</span>
+                                            if self.current_event().is_some() {
+                                                {
+                                                    self
+                                                        .current_event()
+                                                        .map(|cur_event|
+                                                            html!(<span class="text-base-content font-mono font-bold">{cur_event.metadata().msg_id()}</span>)
                                                         )
-                                                    )
+                                                }
                                             }
                                         </pre>
-                                    }
+                                        <pre class="text-base-content py-2 font-mono">
+                                            {self.current_event().map(|cur_event| html!(<code>{cur_event.metadata().msg()}</code>))}
+                                        </pre>
+                                    </div>
+                                    <div class="flex flex-col">
+                                        <pre class="text-base-content uppercase"><code>{"-- Model"}</code></pre>
+                                        if self.current_event().is_some() {
+                                            <pre class="text-base-content pt-2 font-mono">
+                                                {
+                                                    self
+                                                        .current_event()
+                                                        .map(|cur_event|
+
+                                                            html!(
+                                                                <code>
+                                                                    {
+                                                                        b64_general_purpose::STANDARD.decode(cur_event.model()).ok().map(|raw_bytes| String::from_utf8(raw_bytes).unwrap_or_default())
+                                                                    }
+                                                                </code>
+                                                            )
+                                                        )
+                                                }
+                                            </pre>
+                                        }
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                    // }
-                </div>
+                        }
+                    </div>
             </main>
         )
     }

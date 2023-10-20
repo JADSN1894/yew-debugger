@@ -2,9 +2,10 @@
   "name": "node-starter",
   "version": "0.0.0",
   "scripts": {
-    "tailwind": "./tailwindcss -i ./input.css -o ./output.css",
+    "tailwind-debug": "./tailwindcss --input ./input.css --output ./output.css",
+    "tailwind-release": "./tailwindcss --input ./input.css --output ./output.css --minify",
     "dev": "vite",
-    "build": "npm run tailwind && vite build",
+    "build": "npm run tailwind-release && vite build",
     "preview": "npm run build && vite preview"
   },
   "devDependencies": {

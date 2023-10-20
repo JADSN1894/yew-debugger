@@ -1,4 +1,4 @@
-import init, { print, print_with_value, yew_debugger_panel, yew_debugger_collector } from './background/background.js';
+import init, { welcome_to_background, yew_debugger_collector } from './background/background.js';
 
 var EVENTS_COLLECTOR = []
 var CURRENT_TAB = null
@@ -11,8 +11,7 @@ async function runDemo() {
   //* Initialize the WASM module
   await init();
 
-  print();
-  print_with_value('');
+  welcome_to_background();
 }
 
 chrome.runtime.onMessage.addListener(

@@ -375,7 +375,7 @@ impl Component for App {
                                                 } else {
                                                     html!(
                                                         <div class="h-screen">
-                                                            <div class="pr-1 flex flex-col w-full gap-y-2 h-4/5 overflow-y-auto">
+                                                            <div class="pr-1 flex flex-col w-full gap-y-2 h-4/5 overflow-y-auto overflow-x-hidden scroll-smooth">
                                                             {
                                                                 events.into_iter().rev().map(|event_item| {
                                                                     let cur_event_item = event_item.clone();

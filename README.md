@@ -12,9 +12,9 @@ An Elm-like debugger DevTools extension for Yew.
 
 ### <a id="cloning-the-repository"></a> Cloning the repository
 1. Clone the repository: `git clone --depth=1 git@github.com:JADSN1894/yew-debugger.git`
-1. Move to directory `yew-debugger`: `cd yew-debugger`
-1. Open in VsCode: `code .`
-1. Open in DevContainer 
+1. Change to directory `yew-debugger`: `cd yew-debugger`
+1. Open *yew-debugger folder in VsCode*: `code .`
+1. Open the *Dev Container*
    
 ![Screenshot](docs/getting-started/01-open-dev-container-in-vscode.png?raw=true)
 
@@ -50,10 +50,12 @@ An Elm-like debugger DevTools extension for Yew.
    1. `yew-app-example.zip`
    1. `yew-debugger.crx`
    
+1. Create a folder named: *yew-debugger*  
+1. Change to directory: `cd yew-debugger`
 1. Extract the compressed files :
    1. `unzip yew-debugger.crx.zip -d crx`
-   2. `unzip yew-app-example.zip.zip -d dist-example`
-   3. Directory after extract 
+   1. `unzip yew-app-example.zip.zip -d dist-example`
+   1. Directory after extract 
    ```
     ├── crx
     │   ├── assets

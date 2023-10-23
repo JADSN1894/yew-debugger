@@ -8,5 +8,5 @@ code --install-extension ms-vscode-remote.remote-containers
 
 # -- T0 Docker
 docker image ls | awk '/^vsc/{print $3}' | xargs docker rmi --force
-docker volume rm --force vscode
 docker system prune --all --volumes --force
+docker volume rm --force vscode

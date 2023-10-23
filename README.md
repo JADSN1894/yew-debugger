@@ -34,7 +34,12 @@ An Elm-like debugger DevTools extension for Yew.
 9. Execute: `make demo`
 1. Execute: `python3 -m http.server --directory ./dist-example/`
 1. In a chromium-based open extensions window: `chrome://extensions/`
-1. Click at `Load unpacked` button
+1. At right top corner enable **Developer mode**
+
+![Screenshot](docs/getting-started/05-enable-developer-mode.png?raw=true)
+
+
+13. Click at `Load unpacked` button
 1. Open the `crx` folder
 1. Click at `service worker(inactive)`
 1. Check if show at least this two logs:
@@ -43,20 +48,20 @@ An Elm-like debugger DevTools extension for Yew.
 1. Open in new tab: `http://localhost:8000/`
 1. Open DevTools pressing `F12` or `crtl + shift + i`
 1. At DevTools panel tab open the tab `Yew Debugger`
-1. And controll your application. 😎
+1.  And controll your application. 😎
 
 ### From actions artifacts
 
 1. Download the artifacts:
    1. `yew-app-example.zip`
-   1. `yew-debugger.crx`
+   1. `yew-debugger-crx.zip`
    
 1. Create a folder named: *yew-debugger*  
 1. Change to directory: `cd yew-debugger`
 1. Extract the compressed files :
-   1. `unzip yew-debugger.crx.zip -d crx`
-   1. `unzip yew-app-example.zip.zip -d dist-example`
-   1. Directory after extract 
+   1. `unzip yew-debugger-crx.zip -d crx`
+   2. `unzip yew-app-example.zip -d dist-example`
+   3. Directory after extract 
    ```
     ├── crx
     │   ├── assets
@@ -81,8 +86,8 @@ An Elm-like debugger DevTools extension for Yew.
     │   ├── favicon.ico
     │   ├── index.html
     │   └── vite.svg
-    ├── yew-app-example.zip.zip
-    └── yew-debugger.crx.zip
+    ├── yew-app-example.zip
+    └── yew-debugger-crx.zip
      ```
     4. Follow the steps from **8** of [Cloning the repository](#cloning-the-repository) instructions
 

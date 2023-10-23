@@ -79,7 +79,7 @@ jobs:
       - run: cp -rv ./examples/yew-debugger-counter-layout/dist ~/temp-artifacts/dist-example
       - uses: actions/upload-artifact@v3
         with:
-          name: yew-app-example.zip
+          name: yew-app-example
           path:  ~/temp-artifacts/dist-example
           retention-days: 14
  
@@ -180,6 +180,6 @@ jobs:
             panel.tmp
       - uses: actions/upload-artifact@v3
         with:
-          name: yew-debugger.crx
+          name: yew-debugger-crx
           path: ~/crx/
           retention-days: 14

@@ -6,7 +6,6 @@ use gloo::{
 };
 use js_sys::Date;
 use models::{CounterModel, ThemeMode};
-use serde::Serialize;
 use std::ops::{AddAssign, SubAssign};
 use wasm_bindgen::{prelude::wasm_bindgen, JsCast, JsValue, UnwrapThrowExt};
 use web_sys::HtmlElement;
@@ -14,14 +13,14 @@ use yew::{html, Component, Context, Html};
 use yew_debugger::impl_yew_debugger;
 use yew_debugger_derive::{YewMessage, YewModel};
 
-#[derive(Debug, Serialize, YewMessage)]
+#[derive(Debug, YewMessage)]
 pub enum Msg {
     Increment,
     Decrement,
     ToggleThemeMode,
 }
 
-#[derive(Debug, Serialize, YewModel)]
+#[derive(Debug, YewModel)]
 pub struct App {
     counter: CounterModel,
     current_theme_mode: ThemeMode,

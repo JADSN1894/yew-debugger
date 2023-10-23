@@ -10,7 +10,7 @@ An Elm-like debugger DevTools extension for Yew.
 
 ## 👍 Acknowledgements
 
-Huge thanks to [afsec](https://github.com/afsec#afsec) for giving me the idea for this project, sharing the inspiration behind it, and implementing the first iteration in Rust. Your contributions have been invaluable.
+Huge thanks to [afsec](https://github.com/afsec) for giving me the idea for this project, sharing the inspiration behind it, and implementing the first iteration in Rust. Your contributions have been invaluable.
 
 ## 📪 Contact
 

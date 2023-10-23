@@ -6,22 +6,25 @@ use gloo::{
 };
 use js_sys::Date;
 use models::{CounterModel, ThemeMode};
-use serde::Serialize;
 use std::ops::{AddAssign, SubAssign};
 use wasm_bindgen::{prelude::wasm_bindgen, JsCast, JsValue, UnwrapThrowExt};
 use web_sys::HtmlElement;
 use yew::{html, Component, Context, Html};
+
+// * Yew Debugger Imports: 1 of 5
 use yew_debugger::impl_yew_debugger;
 use yew_debugger_derive::{YewMessage, YewModel};
 
-#[derive(Debug, Serialize, YewMessage)]
+// * YewMessage Derive: 2 of 5
+#[derive(Debug, YewMessage)]
 pub enum Msg {
     Increment,
     Decrement,
     ToggleThemeMode,
 }
 
-#[derive(Debug, Serialize, YewModel)]
+// * YewModel Derive: 3 of 5
+#[derive(Debug, YewModel)]
 pub struct App {
     counter: CounterModel,
     current_theme_mode: ThemeMode,
@@ -67,7 +70,7 @@ impl Default for App {
     }
 }
 
-// * Yew Debugger Setup: 1 of 2
+// * Yew Debugger Implementation: 4 of 5
 impl_yew_debugger!(App, Msg);
 
 impl Component for App {
@@ -79,7 +82,7 @@ impl Component for App {
     }
 
     fn update(&mut self, _ctx: &Context<Self>, msg: Self::Message) -> bool {
-        // * Yew Debugger Setup: 2 of 2
+        // * Yew Debugger Setup: 5 of 5
         #[cfg(debug_assertions)]
         App::send_to_debbuger(self, &msg);
 
@@ -152,7 +155,7 @@ impl Component for App {
 
                                 // A button to send two Increment messages
                                 <button class="btn btn-success" onclick={ctx.link().batch_callback(|_| vec![Msg::Increment, Msg::Increment])}>
-                                    { "*2" }
+                                    { "+1 +1" }
                                 </button>
                             </div>
                         </div>

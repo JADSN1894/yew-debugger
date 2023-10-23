@@ -1,6 +1,4 @@
-use serde::Serialize;
-
-#[derive(Clone, Debug, Default, Serialize)]
+#[derive(Clone, Debug, Default)]
 pub enum ThemeMode {
     #[default]
     Dark,

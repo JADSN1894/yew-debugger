@@ -3,14 +3,14 @@ chrome.devtools.panels.create('Yew Debugger', 'icon.png', 'panel.html', panel =>
   console.log('Yew Debugger devtools tab clicked');
   // chrome.devtools.inspectedWindow.eval("Waat");
 
-  panel.onShown.addListener((extPanelWindow) => {
+  // panel.onShown.addListener((extPanelWindow) => {
 
-    console.log("extPanelWindow");
-    console.log(extPanelWindow);
-    console.log('devtools - panel.onShown');
+  //   console.log("extPanelWindow");
+  //   console.log(extPanelWindow);
+  //   console.log('devtools - panel.onShown');
 
-    // Function to handle the connection to the DevTools panel
-  });
+  //   // Function to handle the connection to the DevTools panel
+  // });
 });
 
 // chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {

@@ -18,7 +18,6 @@ crate-type = ["cdylib", "rlib"]
 [dependencies]
 gloo = { version = "=0.10.0" }
 js-sys = { version = "=0.3.64" }
-serde = { version = "1.0.188", features = ["derive"] }
 wasm-bindgen = { version = "=0.2.87" }
 web-sys = { version = "=0.3.64" }
 yew = { version = "=0.21.0", features = ["csr"] }

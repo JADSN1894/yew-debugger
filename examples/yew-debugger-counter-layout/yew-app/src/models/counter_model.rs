@@ -1,7 +1,6 @@
-use serde::Serialize;
 use std::ops::{AddAssign, SubAssign};
 
-#[derive(Clone, Debug, Default, PartialEq, Serialize)]
+#[derive(Clone, Debug, Default, PartialEq)]
 pub struct CounterModel(i64);
 
 impl CounterModel {

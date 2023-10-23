@@ -71,7 +71,7 @@ pub enum PanelCommand {
 
 #[wasm_bindgen]
 pub fn yew_debugger_panel(input: String) -> Result<String, String> {
-    log!("WASM - [{}]: yew_debugger_collector", file!());
+    log!("WASM - [{}]: yew_debugger_panel", file!());
     log!(&input);
     match serde_json::from_str::<EventMetadata>(&input) {
         Ok(inner_envelope) => {

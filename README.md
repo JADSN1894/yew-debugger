@@ -1,9 +1,15 @@
 # YewDebugger
 
-An Elm-like debugger DevTools extension for Yew.
-
-## Status
 ![Makefile CI](https://github.com/JADSN1894/yew-debugger/actions/workflows/makefile.yml/badge.svg)
+[![Repository license](https://img.shields.io/github/license/JADSN1894/yew-debugger)](https://github.com/JADSN1894/yew-debugger/blob/dev/LICENSE)
+[![Crates.io: yew-debugger](https://img.shields.io/crates/v/yew-debugger.svg)](https://crates.io/crates/yew-debugger)
+[![Crates.io: yew-debugger-derive](https://img.shields.io/crates/v/yew-debugger-derive.svg)](https://crates.io/crates/yew-debugger-derive) **(derive)**
+
+**yew-debugger** is a devtools extension for debugging Yew applications that includes the following features:
+
+- It is built upon the minimally invasive implementation of only three traits: `YewComponentModel`, `YewComponentMessage`, and `YewComponentDebug`.
+- It offers a detailed view of messages and changes in the Model during state transitions.
+- It provides a real-time, straight-forward view of the application's MVU (Model, View, Update) cycles.
 
 ## Screenshot
 ![Screenshot](docs/screenshots/yew-debugger-running-with-example.png?raw=true)

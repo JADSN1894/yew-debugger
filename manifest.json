@@ -1,7 +1,7 @@
 {
   "name": "Yew Debugger",
   "author": "JADSN1894",
-  "version": "0.3",
+  "version": "1.0",
   "manifest_version": 3,
   "description": "An Elm-like debugger for Yew",
   "homepage_url": "https://github.com/JADSN1894/yew-debugger",

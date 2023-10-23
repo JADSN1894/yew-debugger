@@ -14,23 +14,24 @@ An Elm-like debugger DevTools extension for Yew.
 1. Clone the repository: `git clone --depth=1 git@github.com:JADSN1894/yew-debugger.git`
 1. Change to directory `yew-debugger`: `cd yew-debugger`
 1. Open *yew-debugger folder in VsCode*: `code .`
+1. Install the extension [**Dev Containers**](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers)
 1. Open the *Dev Container*
    
 ![Screenshot](docs/getting-started/01-open-dev-container-in-vscode.png?raw=true)
 
-4. Install the extensions *(Optional)*
+6. Install the extensions *(Optional)*
 
 ![Screenshot](docs/getting-started/02-install-vscode-extensions-at-devcontainer.png?raw=true)
 
-5. When see the *"...Done. Press any ke to close the terminal."* press `c`:
+7. When see the *"...Done. Press any ke to close the terminal."* press `c`:
 
 ![Screenshot](docs/getting-started/03-after-finish-devcontainer.png?raw=true)
 
-6. Open new terminal:
+8. Open new terminal:
 
 ![Screenshot](docs/getting-started/04-open-new-terminal.png?raw=true)
 
-7. Execute: `make demo`
+9. Execute: `make demo`
 1. Execute: `python3 -m http.server --directory ./dist-example/`
 1. In a chromium-based open extensions window: `chrome://extensions/`
 1. Click at `Load unpacked` button

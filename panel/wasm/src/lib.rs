@@ -128,6 +128,24 @@ impl EventMetadata {
     }
 }
 
+fn handle_event_metadata_msg(input: impl AsRef<str>) -> Option<String> {
+    let first_line = match input.as_ref().lines().next() {
+        Some(s) => s,
+        None => return None,
+    };
+    dbg!(&first_line);
+    if first_line.contains('(') {
+        let str2 = first_line.split('(').collect::<Vec<&str>>();
+        str2.first().map(|s| format!("{s} (..)"))
+    } else if first_line.contains('{') {
+        let str2 = first_line.split('{').collect::<Vec<&str>>();
+        str2.first()
+            .map(|item_name| format!("{} {{..}}", item_name.trim_end()))
+    } else {
+        None
+    }
+}
+
 impl Component for App {
     type Message = Msg;
     type Properties = ();
@@ -160,9 +178,6 @@ impl Component for App {
     }
 
     fn update(&mut self, ctx: &Context<Self>, msg: Self::Message) -> bool {
-        // let command: Option<()> = None;
-        // let mut self_clone = self.clone();
-
         let should_render = match msg {
             Msg::GetEvents => {
                 let command = json!(
@@ -189,20 +204,16 @@ impl Component for App {
 
                         match serde_wasm_bindgen::from_value::<MessageOutcome>(message) {
                             Ok(envelope) => {
-                                // log!("&envelope");
-                                // log!(format!("{:?}", &envelope));
                                 ctx_clone.send_message(Msg::RenderEvents(envelope));
                             }
-                            Err(_error) => {
-                                // log!("ERROR");
-                                // log!(error.to_string());
+                            Err(error) => {
+                                log!("ERROR");
+                                log!(error.to_string());
                             }
                         };
                     })
                         as Box<dyn FnMut(JsValue, JsValue, JsValue)>);
 
-                // log!("panel_wasm::sendMessage::js_value");
-                // log!(&js_value);
                 sendMessage(js_value, &closure.as_ref().unchecked_ref());
 
                 closure.forget();
@@ -246,8 +257,6 @@ impl Component for App {
                     })
                         as Box<dyn FnMut(JsValue, JsValue, JsValue)>);
 
-                // log!("panel_wasm::sendMessage::js_value");
-                // log!(&js_value);
                 sendMessage(js_value, &closure.as_ref().unchecked_ref());
 
                 self.set_current_event(None);
@@ -284,12 +293,8 @@ impl Component for App {
 
                 let closure =
                     Closure::wrap(Box::new(move |message: JsValue, _: JsValue, _: JsValue| {
-                        log!("Closure::ReloadApplication");
-
                         match serde_wasm_bindgen::from_value::<MessageOutcome>(message) {
                             Ok(envelope) => {
-                                log!("&envelope");
-                                log!(format!("{:?}", &envelope));
                                 ctx_clone.send_message(Msg::RenderEvents(envelope));
                             }
                             Err(error) => {
@@ -343,8 +348,6 @@ impl Component for App {
             maybe_error,
         } = model.message_outcome().clone();
 
-        // log!("{:?}", format!(&model.message_outcome().clone()));
-
         html!(
             <main class="h-full w-full p-4">
                 <div class="flex flex-col w-full gap-y-2">
@@ -358,7 +361,7 @@ impl Component for App {
                             </div>
                         </div>
 
-                        // Avoid render the `[1] Impossible state` in first render
+                        //* Avoid render the `[1] Impossible state` in first render
                         if is_ok == false && maybe_data.is_none() && maybe_error.is_none() {
                             <></>
                         } else {
@@ -390,14 +393,14 @@ impl Component for App {
 
                                                                         html!(
                                                                             <button class={classes!(["flex items-center justify-between btn !normal-case", message_selected_color])} onclick={ctx.link().callback(cb_change_event_content_on_click)}>
-                                                                                <span class="font-mono font-bold">{msg}</span>
+                                                                                <span class="font-mono font-bold">{handle_event_metadata_msg( msg).unwrap_or(msg.into())}</span>
                                                                                 <span class="font-mono font-bold">{msg_id}</span>
                                                                             </button>
                                                                         )
                                                                     } else {
                                                                         html!(
                                                                             <button class="flex items-center justify-between btn btn-primary !normal-case" onclick={ctx.link().callback(cb_change_event_content_on_click)}>
-                                                                                <span class="font-mono font-bold">{msg}</span>
+                                                                                <span class="font-mono font-bold">{handle_event_metadata_msg( msg).unwrap_or(msg.into())}</span>
                                                                                 <span class="font-mono font-bold">{msg_id}</span>
                                                                             </button>
                                                                         )
@@ -424,44 +427,45 @@ impl Component for App {
                                 </div>
                                 //* Right side: Current message content
                                 // TODO: FIX - [JADSN]: Height base on user height size
-                                <div class="flex flex-col flex-grow pl-1 overflow-y-auto h-[600px]">
-                                <div class="flex flex-col">
-                                        <pre class="text-primary-content uppercase">
-                                            <span class="text-base-content">{"-- Message "}</span>
-                                            if self.current_event().is_some() {
-                                                {
-                                                    self
-                                                        .current_event()
-                                                        .map(|cur_event|
-                                                            html!(<span class="text-base-content font-mono font-bold">{cur_event.metadata().msg_id()}</span>)
-                                                        )
-                                                }
-                                            }
-                                        </pre>
-                                        <pre class="text-base-content py-2 font-mono">
-                                            {self.current_event().map(|cur_event| html!(<code>{cur_event.metadata().msg()}</code>))}
-                                        </pre>
-                                    </div>
-                                    <div class="flex flex-col">
-                                        <pre class="text-base-content uppercase"><code>{"-- Model"}</code></pre>
-                                        if self.current_event().is_some() {
-                                            <pre class="text-base-content pt-2 font-mono">
-                                                {
-                                                    self
-                                                        .current_event()
-                                                        .map(|cur_event|
-
-                                                            html!(
-                                                                <code>
-                                                                    {
-                                                                        b64_general_purpose::STANDARD.decode(cur_event.model()).ok().map(|raw_bytes| String::from_utf8(raw_bytes).unwrap_or_default())
-                                                                    }
-                                                                </code>
+                                <div class="h-screen">
+                                    <div class="flex flex-col flex-grow pl-1 h-4/5 overflow-y-auto scroll-smooth">
+                                        <div class="flex flex-col">
+                                            <pre class="text-primary-content uppercase">
+                                                <span class="text-base-content">{"-- Message "}</span>
+                                                if self.current_event().is_some() {
+                                                    {
+                                                        self
+                                                            .current_event()
+                                                            .map(|cur_event|
+                                                                html!(<span class="text-base-content font-mono font-bold">{cur_event.metadata().msg_id()}</span>)
                                                             )
-                                                        )
+                                                    }
                                                 }
                                             </pre>
-                                        }
+                                            <pre class="text-base-content py-2 font-mono">
+                                                {self.current_event().map(|cur_event| html!(<code>{cur_event.metadata().msg()}</code>))}
+                                            </pre>
+                                        </div>
+                                        <div class="flex flex-col">
+                                            <pre class="text-base-content uppercase"><code>{"-- Model"}</code></pre>
+                                            if self.current_event().is_some() {
+                                                <pre class="text-base-content pt-2 font-mono">
+                                                    {
+                                                        self
+                                                            .current_event()
+                                                            .map(|cur_event|
+                                                                html!(
+                                                                    <code>
+                                                                        {
+                                                                            b64_general_purpose::STANDARD.decode(cur_event.model()).ok().map(|raw_bytes| String::from_utf8(raw_bytes).unwrap_or_default())
+                                                                        }
+                                                                    </code>
+                                                                )
+                                                            )
+                                                    }
+                                                </pre>
+                                            }
+                                        </div>
                                     </div>
                                 </div>
                             </div>

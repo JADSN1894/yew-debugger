@@ -14,10 +14,6 @@ window.addEventListener(
 
         console.log("response");
         console.log(response);
-
-        // const from_background_wasm = JSON.parse(response["message"])
-        // console.log("from_background_wasm");
-        // console.log(from_background_wasm);
     },
     false,
 );

@@ -11,7 +11,7 @@ exclude = [
 
 
 [workspace.dependencies]
-base64 = { version = "0.21.4" }
+base64 = { version = "0.21.5" }
 gloo = { version = "0.10.0" }
 yew = { version = "0.21.0" }
 js-sys = { version = "0.3.64" }

@@ -426,8 +426,7 @@ impl Component for App {
                                     }
                                 </div>
                                 //* Right side: Current message content
-                                // TODO: FIX - [JADSN]: Height base on user height size
-                                <div class="h-screen">
+                                <div class="h-screen w-full">
                                     <div class="flex flex-col flex-grow pl-1 h-4/5 overflow-y-auto scroll-smooth">
                                         <div class="flex flex-col">
                                             <pre class="text-primary-content uppercase">

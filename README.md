@@ -46,7 +46,7 @@
 
 
 13. Click at `Load unpacked` button
-1. Open the `crx` folder
+1. Open the `crx` folder, (If comming *from actions artifacts* section, the folder name is `yew-debugger-crx`)
 1. Click at `service worker(inactive)`
 1. Check if show at least this two logs:
     1. *[From background module]: Hello from YewDebugger*
@@ -59,21 +59,41 @@
 ### From actions artifacts
 
 1. Download the artifacts:
-   1. `yew-app-example.zip`
    1. `yew-debugger-crx.zip`
-   
+   1. `dist-example-yew-debugger-counter-layout.zip`
+   1. `dist-example-spreadsheet-cells-with-yew-debugger.zip`
 1. Create a folder named: *yew-debugger*  
 1. Change to directory: `cd yew-debugger`
 1. Extract the compressed files :
    1. `unzip yew-debugger-crx.zip -d crx`
-   2. `unzip yew-app-example.zip -d dist-example`
-   3. Directory after extract 
+   1. `unzip dist-example-yew-debugger-counter-layout.zip -d dist-example-yew-debugger-counter-layout`
+   1. `unzip dist-example-spreadsheet-cells-with-yew-debugger.zip -d dist-example-spreadsheet-cells-with-yew-debugger`
+   1. Directory after extract 
    ```
-    ├── crx
+    .
+    ├── dist-example-spreadsheet-cells-with-yew-debugger
+    │   ├── frontend-wasm
+    │   │   ├── index_bg.wasm
+    │   │   ├── index.js
+    │   │   └── package.json
+    │   ├── index.html
+    │   ├── index.js
+    │   └── output.css
+    ├── dist-example-spreadsheet-cells-with-yew-debugger.zip
+    ├── dist-example-yew-debugger-counter-layout
     │   ├── assets
-    │   │   ├── index-63dd7a97.js
-    │   │   ├── index-ed7813bc.css
-    │   │   └── panel_bg-7c570c26.wasm
+    │   │   ├── index-0c5742a5.js
+    │   │   ├── index_bg-2f50b49e.wasm
+    │   │   └── index-d9ca7bb5.css
+    │   ├── favicon.ico
+    │   ├── index.html
+    │   └── vite.svg
+    ├── dist-example-yew-debugger-counter-layout.zip
+    ├── yew-debugger-crx
+    │   ├── assets
+    │   │   ├── index-643717a7.css
+    │   │   ├── index-df5db1f8.js
+    │   │   └── panel_bg-88b3fac6.wasm
     │   ├── background
     │   │   ├── background_bg.wasm
     │   │   ├── background.js
@@ -84,18 +104,9 @@
     │   ├── devtools.js
     │   ├── manifest.json
     │   └── panel.html
-    ├── dist-example
-    │   ├── assets
-    │   │   ├── index-55ebed22.js
-    │   │   ├── index_bg-1410e969.wasm
-    │   │   └── index-d9ca7bb5.css
-    │   ├── favicon.ico
-    │   ├── index.html
-    │   └── vite.svg
-    ├── yew-app-example.zip
     └── yew-debugger-crx.zip
      ```
-    4. Follow the steps from **8** of [Cloning the repository](#cloning-the-repository) instructions
+    3. Follow the steps from **8** of [Cloning the repository](#cloning-the-repository) instructions
 
 ## 👍 Acknowledgements
 

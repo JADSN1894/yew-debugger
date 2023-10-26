@@ -4,3 +4,5 @@
 /background/pkg
 /crx
 /dist-example
+/dist-example-yew-debugger-counter-layout
+/dist-example-spreadsheet-cells-with-yew-debugger

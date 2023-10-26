@@ -1,0 +1,29 @@
+[package]
+name = "frontend"
+edition.workspace = true
+version.workspace = true
+license.workspace = true
+publish.workspace = true
+rust-version.workspace = true
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[dependencies]
+gloo = { workspace = true }
+js-sys = { workspace = true }
+lazy_static = { workspace = true }
+regex = { workspace = true }
+serde = { workspace = true, features = ["derive"] }
+serde_json = { workspace = true }
+thiserror = { workspace = true }
+wasm-bindgen = { workspace = true }
+wasm-bindgen-futures = { workspace = true }
+web-sys = { workspace = true, features = [
+    "Clipboard",
+    "ClipboardEvent",
+    "Navigator",
+] }
+yew = { workspace = true, features = ["csr"] }
+yew-debugger = { workspace = true }
+yew-debugger-derive = { workspace = true }

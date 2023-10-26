@@ -1,0 +1,25 @@
+[workspace]
+members = ["frontend"]
+resolver = "2"
+
+[workspace.package]
+edition = "2021"
+version = "0.1.0"
+license = "MIT"
+publish = false
+rust-version = "1.73.0"
+
+[workspace.dependencies]
+gloo = { version = "0.10.0" }
+js-sys = { version = "0.3.64" }
+lazy_static = { version = "1.4.0" }
+regex = { version = "1.10.2" }
+serde = { version = "1.0.189" }
+serde_json = "1.0.107"
+thiserror = { version = "1.0.50" }
+wasm-bindgen = { version = "0.2.87" }
+wasm-bindgen-futures = "0.4.37"
+web-sys = { version = "0.3.64" }
+yew = { version = "0.21.0" }
+yew-debugger = { version = "0.0.1" }
+yew-debugger-derive = { version = "0.0.1" }

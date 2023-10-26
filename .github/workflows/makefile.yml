@@ -53,7 +53,7 @@ jobs:
       - name: Cargo check
         run: cargo check --release
 
-  example:
+  example-counter:
     needs: wasm-pack
     runs-on: ubuntu-latest
     steps:
@@ -74,15 +74,47 @@ jobs:
           path: ~/bin-wasm-pack/
       - run: cp -v ~/bin-wasm-pack/wasm-pack /usr/local/bin/
       - run: chmod +x /usr/local/bin/wasm-pack
-      - run: make build_example_debug
+      - run: make build_example_yew_debugger_counter_layout_debug
+      - run: make build_example_spreadsheet_cells_with_yew_debugger_debug
       - run: mkdir -p ~/temp-artifacts
-      - run: cp -rv ./examples/yew-debugger-counter-layout/dist ~/temp-artifacts/dist-example
+      - run: cp -rv ./examples/yew-debugger-counter-layout/dist ~/temp-artifacts/dist-example-yew-debugger-counter-layout
       - uses: actions/upload-artifact@v3
         with:
-          name: yew-app-example
-          path:  ~/temp-artifacts/dist-example
+          name: dist-example-yew-debugger-counter-layout
+          path: ~/temp-artifacts/dist-example-yew-debugger-counter-layout
           retention-days: 14
- 
+    
+  example-spreadsheet-cells:
+    needs: wasm-pack
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Cache cargo registry
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+          key: ${{ runner.os }}-${{ matrix.backend }}-cargo-${{ hashFiles('**/Cargo.toml') }}
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - uses: actions/download-artifact@v3
+        with:
+          name: wasm-pack
+          path: ~/bin-wasm-pack/
+      - run: cp -v ~/bin-wasm-pack/wasm-pack /usr/local/bin/
+      - run: chmod +x /usr/local/bin/wasm-pack
+      - run: make build_example_yew_debugger_counter_layout_debug
+      - run: make build_example_spreadsheet_cells_with_yew_debugger_debug
+      - run: mkdir -p ~/temp-artifacts
+      - run: cp -rv ./examples/spreadsheet-cells-with-yew-debugger/dist ~/temp-artifacts/dist-example-spreadsheet-cells-with-yew-debugger
+      - uses: actions/upload-artifact@v3
+        with:
+          name: dist-example-spreadsheet-cells-with-yew-debugger
+          path:  ~/temp-artifacts/dist-example-spreadsheet-cells-with-yew-debugger
+          retention-days: 14
+
   background:
     needs: wasm-pack
     runs-on: ubuntu-latest
@@ -112,7 +144,7 @@ jobs:
           name: background.tmp
           path:  ~/temp-artifacts/dist-background
           retention-days: 1
-
+  
   panel:
     needs: wasm-pack
     runs-on: ubuntu-latest
@@ -142,7 +174,7 @@ jobs:
           name: panel.tmp
           path:  ~/temp-artifacts/dist-panel
           retention-days: 1
- 
+   
   crx:
     needs: [panel, background]
     runs-on: ubuntu-latest

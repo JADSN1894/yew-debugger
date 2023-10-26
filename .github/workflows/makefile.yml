@@ -13,7 +13,7 @@ jobs:
       WASM_PACK_REPO: rustwasm/wasm-pack
       WASM_PACK_CURRENT_VERSION: v0.12.1
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Cache cargo registry
         uses: actions/cache@v3
         with:
@@ -21,9 +21,9 @@ jobs:
             ~/.cargo/registry
             ~/.cargo/git
           key: ${{ runner.os }}-${{ matrix.backend }}-cargo-${{ hashFiles('**/Cargo.toml') }}
-      - uses: actions/setup-node@v3
+      - uses: actions/setup-node@v4
         with:
-          node-version: 18
+          node-version: 20
       - run: mkdir -p ~/bin-wasm-pack/
       - run: curl -sSfL https://github.com/$WASM_PACK_REPO/releases/download/$WASM_PACK_CURRENT_VERSION/wasm-pack-$WASM_PACK_CURRENT_VERSION-x86_64-unknown-linux-musl.tar.gz |  zcat - | tar xvf - "wasm-pack-$WASM_PACK_CURRENT_VERSION-x86_64-unknown-linux-musl/"
       - run: mv wasm-pack-$WASM_PACK_CURRENT_VERSION-x86_64-unknown-linux-musl/wasm-pack ~/bin-wasm-pack/
@@ -38,7 +38,7 @@ jobs:
     if: false
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3   
+      - uses: actions/checkout@v4  
       - name: Cache cargo registry
         uses: actions/cache@v3
         with:
@@ -57,7 +57,7 @@ jobs:
     needs: wasm-pack
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Cache cargo registry
         uses: actions/cache@v3
         with:
@@ -65,9 +65,9 @@ jobs:
             ~/.cargo/registry
             ~/.cargo/git
           key: ${{ runner.os }}-${{ matrix.backend }}-cargo-${{ hashFiles('**/Cargo.toml') }}
-      - uses: actions/setup-node@v3
+      - uses: actions/setup-node@v4
         with:
-          node-version: 18
+          node-version: 20
       - uses: actions/download-artifact@v3
         with:
           name: wasm-pack
@@ -87,7 +87,7 @@ jobs:
     needs: wasm-pack
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Cache cargo registry
         uses: actions/cache@v3
         with:
@@ -95,9 +95,9 @@ jobs:
             ~/.cargo/registry
             ~/.cargo/git
           key: ${{ runner.os }}-${{ matrix.backend }}-cargo-${{ hashFiles('**/Cargo.toml') }}
-      - uses: actions/setup-node@v3
+      - uses: actions/setup-node@v4
         with:
-          node-version: 18
+          node-version: 20
       - uses: actions/download-artifact@v3
         with:
           name: wasm-pack
@@ -117,7 +117,7 @@ jobs:
     needs: wasm-pack
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Cache cargo registry
         uses: actions/cache@v3
         with:
@@ -125,9 +125,9 @@ jobs:
             ~/.cargo/registry
             ~/.cargo/git
           key: ${{ runner.os }}-${{ matrix.backend }}-cargo-${{ hashFiles('**/Cargo.toml') }}
-      - uses: actions/setup-node@v3
+      - uses: actions/setup-node@v4
         with:
-          node-version: 18
+          node-version: 20
       - uses: actions/download-artifact@v3
         with:
           name: wasm-pack
@@ -147,7 +147,7 @@ jobs:
     needs: [panel, background]
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Cache cargo registry
         uses: actions/cache@v3
         with:

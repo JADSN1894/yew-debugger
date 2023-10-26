@@ -1,4 +1,4 @@
-FROM node:18.18.2-bullseye
+FROM node:20.9.0-bullseye
 
 # Install a basic environment needed for our build tools
 RUN apt -yq update && \

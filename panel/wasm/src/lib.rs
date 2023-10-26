@@ -241,12 +241,10 @@ impl Component for App {
 
                 let closure =
                     Closure::wrap(Box::new(move |message: JsValue, _: JsValue, _: JsValue| {
-                        log!("Closure::ResetEvents");
+                        // log!("Closure::ResetEvents");
 
                         match serde_wasm_bindgen::from_value::<MessageOutcome>(message) {
                             Ok(envelope) => {
-                                log!("&envelope");
-                                log!(format!("{:?}", &envelope));
                                 cloned_ctx.send_message(Msg::RenderEvents(envelope));
                             }
                             Err(error) => {

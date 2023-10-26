@@ -69,8 +69,11 @@ async function handleMessageFromPanel(sender, message, sendResponse) {
         break;
 
       case "ReloadApplication":
-        chrome.tabs.query({ active: true, currentWindow: true }, function (arrayOfTabs) {
-          chrome.tabs.reload(arrayOfTabs[0].id);
+        chrome.windows.getCurrent(currentWindow => {
+          chrome.tabs.query({ active: true, windowId: currentWindow.id }, arrayOfTabs => {
+            const tabId = arrayOfTabs[0].id;
+            chrome.tabs.reload(tabId, { bypassCache: true });
+          });
         });
         sendResponse({
           isOk: true,

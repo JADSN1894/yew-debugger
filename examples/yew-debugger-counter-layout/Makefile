@@ -20,6 +20,12 @@ help:
 	@printf "\t$(MAKE) debug\n"
 	@printf "\n"
 
+download-tailwind:
+	rm -rfv ./tailwindcss
+	curl -sLO https://github.com/tailwindlabs/tailwindcss/releases/latest/download/tailwindcss-linux-x64
+	mv tailwindcss-linux-x64 tailwindcss
+	chmod +x tailwindcss
+
 pre_build:
 	@npm install
 

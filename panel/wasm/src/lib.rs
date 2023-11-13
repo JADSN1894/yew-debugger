@@ -245,6 +245,7 @@ impl Component for App {
 
                         match serde_wasm_bindgen::from_value::<MessageOutcome>(message) {
                             Ok(envelope) => {
+                                log!(format!("{envelope:?}"));
                                 cloned_ctx.send_message(Msg::RenderEvents(envelope));
                             }
                             Err(error) => {

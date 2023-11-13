@@ -17,9 +17,9 @@ crate-type = ["cdylib", "rlib"]
 
 [dependencies]
 gloo = { version = "=0.10.0" }
-js-sys = { version = "=0.3.64" }
-wasm-bindgen = { version = "=0.2.87" }
-web-sys = { version = "=0.3.64" }
+js-sys = { version = "0.3.65" }
+wasm-bindgen = { version = "=0.2.88" }
+web-sys = { version = "=0.3.65" }
 yew = { version = "=0.21.0", features = ["csr"] }
-yew-debugger = { version = "*" }
-yew-debugger-derive = { version = "*" }
+yew-debugger = { version = "=0.0.1" }
+yew-debugger-derive = { version = "=0.0.1" }
